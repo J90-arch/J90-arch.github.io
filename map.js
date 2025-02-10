@@ -78,20 +78,23 @@ function placeDot(top, left) {
     dotLayer.appendChild(pulse);
 }
 
-// Fetch user location and trigger shrinking animation
+// Fetch user location based on the browser's IP and trigger shrinking animation
 async function fetchUserLocation() {
     try {
-        const response = await fetch('http://ip-api.com/json/');
+        const response = await fetch('https://ipinfo.io/json');
         const data = await response.json();
 
-        if (data.status === 'success') {
-            //placeUserLocationDot(data.lat, data.lon);  // Place the user location dot
-            startShrinkingAnimation(data.lat, data.lon);  // Start shrinking animation centered on user location
+        if (data.loc) {
+            const [lat, lon] = data.loc.split(',').map(Number);  // Extract latitude and longitude
+            startShrinkingAnimation(lat, lon);  // Start shrinking animation centered on user location
+        } else {
+            console.error('Location data not available in the response.');
         }
     } catch (error) {
         console.error('Failed to fetch user location:', error);
     }
 }
+
 
 // Shrinking factor: controls how much the square shrinks per step (0.5 = halves each time)
 const shrinkFactor = 0.7;  // Adjust this to control the shrink rate (0.5 = 50% smaller each step)

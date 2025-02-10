@@ -1,1 +1,28 @@
-reader
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Reader</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+</head>
+<body>
+    <div id="reader-container">
+        <!-- Left-side menu -->
+        <div id="menu">
+            <h2>Documents</h2>
+            <ul id="file-list"></ul>
+        </div>
+
+        <!-- Right-side PDF viewer -->
+        <div id="pdf-viewer">
+            <canvas id="pdf-canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- JavaScript for handling PDF rendering -->
+    <script src="read.js"></script>
+</body>
+</html>

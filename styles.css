@@ -141,3 +141,12 @@ body, html {
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
+/* Shrinking Square Animation */
+#shrinking-square {
+    position: absolute;
+    border: 3px solid red;  /* Red border to start */
+    background-color: transparent;  /* Empty inside */
+    z-index: 50;
+    opacity: 0.9;
+    transform: translate(-50%, -50%);
+}

@@ -78,19 +78,90 @@ function placeDot(top, left) {
     dotLayer.appendChild(pulse);
 }
 
-// Fetch user location and place a green dot
+// Fetch user location and trigger shrinking animation
 async function fetchUserLocation() {
     try {
         const response = await fetch('http://ip-api.com/json/');
         const data = await response.json();
 
         if (data.status === 'success') {
-            placeUserLocationDot(data.lat, data.lon);
+            //placeUserLocationDot(data.lat, data.lon);  // Place the user location dot
+            startShrinkingAnimation(data.lat, data.lon);  // Start shrinking animation centered on user location
         }
     } catch (error) {
         console.error('Failed to fetch user location:', error);
     }
 }
+
+// Shrinking factor: controls how much the square shrinks per step (0.5 = halves each time)
+const shrinkFactor = 0.7;  // Adjust this to control the shrink rate (0.5 = 50% smaller each step)
+
+// Start shrinking animation with binary search-like behavior
+function startShrinkingAnimation(lat, lon) {
+    const dotLayer = document.getElementById('dot-layer');
+
+    // Apply the same degree offsets as user location dot
+    const adjustedLon = lon + longitudeOffsetDeg;
+    const adjustedLat = lat + latitudeOffsetDeg;
+
+    // Convert adjusted coordinates to percentage positions
+    const userLeft = mapLongitudeToX(adjustedLon);
+    const userTop = mapLatitudeToY(adjustedLat);
+
+    // Create the shrinking square
+    const square = document.createElement('div');
+    square.id = 'shrinking-square';
+    dotLayer.appendChild(square);
+
+    // Initialize size to cover the viewport and start centered
+    let currentSize = Math.max(window.innerWidth, window.innerHeight);
+    let currentLeft = 50;  // Start centered
+    let currentTop = 50;   // Start centered
+
+    // Shrinking logic with shifting centers
+    const interval = setInterval(() => {
+        // Apply the shrink factor (binary search behavior)
+        currentSize *= shrinkFactor;
+
+        // Shift the square randomly to simulate the center moving
+        const shiftX = (Math.random() - 0.5) * (currentSize * 0.5);  // Shift within 50% of current size
+        const shiftY = (Math.random() - 0.5) * (currentSize * 0.5);
+
+        // Update the position (shifting around the user location)
+        currentLeft = userLeft + (shiftX / window.innerWidth) * 100;
+        currentTop = userTop + (shiftY / window.innerHeight) * 100;
+
+        // Apply size and position
+        square.style.width = `${currentSize}px`;
+        square.style.height = `${currentSize}px`;
+        square.style.left = `${currentLeft}%`;
+        square.style.top = `${currentTop}%`;
+        square.style.transform = 'translate(-50%, -50%)';
+
+        // Stop when square size matches user location dot size (~20px)
+        if (currentSize <= 20) {
+            clearInterval(interval);
+            finalizeSquare(square, userTop, userLeft);
+        }
+    }, 200);  // Constant frame rate for smoother visual
+}
+
+// Finalize the square by replacing it with the .user-location dot
+function finalizeSquare(square, userTop, userLeft) {
+    // Remove the shrinking square
+    square.remove();
+
+    // Create a new .user-location dot at the final position
+    const userDot = document.createElement('div');
+    userDot.className = 'user-location';
+    userDot.style.top = `${userTop}%`;
+    userDot.style.left = `${userLeft}%`;
+
+    // Append the .user-location dot to the dot layer
+    const dotLayer = document.getElementById('dot-layer');
+    dotLayer.appendChild(userDot);
+}
+
 
 // Place the user's location using Robinson projection with offsets
 function placeUserLocationDot(lat, lon) {

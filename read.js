@@ -1,7 +1,6 @@
 // Hardcoded list of PDF files in the 'docs/' folder
 const pdfFiles = [
     'docs/doc1.pdf',
-    'docs/doc2.pdf'
 ];
 
 // Initialize the menu with document links

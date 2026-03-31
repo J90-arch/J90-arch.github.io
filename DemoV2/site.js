@@ -569,6 +569,7 @@ function bindHomeCountryButtons() {
             updateUrlWithoutNavigation(buildPageUrl("home", { country: state.country }));
             renderSidebar(document.getElementById("country-search").value.trim());
             updateHomeHero();
+            refreshShellTargets();
             highlightMapCountry(state.country);
             updateDocumentTitle();
         });
@@ -715,6 +716,7 @@ function bindMapInteractions() {
         updateUrlWithoutNavigation(buildPageUrl("home", { country: state.country }));
         renderSidebar(document.getElementById("country-search").value.trim());
         updateHomeHero();
+        refreshShellTargets();
         highlightMapCountry(state.country);
         updateDocumentTitle();
     });
@@ -1360,7 +1362,25 @@ function renderNotFoundCard(title, message, href) {
 }
 
 function renderNavLink(page, label) {
-    return `<a class="nav-link${isPageActive(page) ? " active" : ""}" href="${buildNavTarget(page)}">${label}</a>`;
+    return `<a class="nav-link${isPageActive(page) ? " active" : ""}" data-nav-page="${page}" href="${buildNavTarget(page)}">${label}</a>`;
+}
+
+function refreshShellTargets() {
+    document.querySelectorAll(".topnav [data-nav-page]").forEach(link => {
+        const page = link.dataset.navPage;
+        link.href = buildNavTarget(page);
+        link.classList.toggle("active", isPageActive(page));
+    });
+
+    const settingsLink = document.getElementById("open-settings-btn");
+    if (settingsLink) {
+        settingsLink.href = buildPageUrl("settings", { country: state.country });
+    }
+
+    const brandCopy = document.querySelector(".shell-brand-copy");
+    if (brandCopy) {
+        brandCopy.innerHTML = `<h1>${escapeHtml(getShellTitle())}</h1><p>${escapeHtml(getShellSubtitle())}</p>`;
+    }
 }
 
 function renderCollectionLink(collection, label) {

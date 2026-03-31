@@ -2,8 +2,8 @@ const FAVORITES_KEY = "worldview_v2_favorites";
 const SETTINGS_KEY = "worldview_v2_settings";
 const LAST_COUNTRY_KEY = "worldview_v2_last_country";
 const DEFAULT_SETTINGS = {
-    accountName: "Demo User",
-    accountEmail: "expat@worldview.demo",
+    accountName: "Alex Morgan",
+    accountEmail: "alex@worldview.app",
     theme: "dark",
     fontSize: "medium",
     language: "English",
@@ -137,7 +137,7 @@ function getShellSubtitle() {
         people: `${entry.name} exploration`,
         movie: `${entry.name} detail`,
         person: `${entry.name} detail`,
-    }[state.page] || "Static prototype";
+    }[state.page] || "WorldView";
 }
 
 function renderShell() {
@@ -238,7 +238,7 @@ function renderSidebar(searchQuery = "") {
             renderTheaterSidebar(header, container);
             break;
         default:
-            header.innerHTML = `<div><h2>Navigation</h2><p>Browse the main sections of the prototype.</p></div>`;
+            header.innerHTML = `<div><h2>Navigation</h2><p>Browse the main sections of WorldView.</p></div>`;
             container.innerHTML = `<div class="sidebar-group sidebar-links">${renderSidebarLink("World Map", buildPageUrl("home", { country: state.country }))}</div>`;
     }
 
@@ -783,7 +783,7 @@ function renderSearchPage(root) {
             <div class="section-header">
                 <div>
                     <h3>${titleResults.length} title results</h3>
-                    <p class="inline-note">Prototype-style poster browsing, while still linking directly into title detail pages.</p>
+                    <p class="inline-note">Browse posters and jump directly into title detail pages.</p>
                 </div>
             </div>
             <div class="poster-result-grid">
@@ -812,7 +812,7 @@ function renderSearchPage(root) {
                 <div>
                     <p class="page-kicker">Search</p>
                     <h2 class="page-title">${escapeHtml(resultHeading)}</h2>
-                    <p class="page-copy">Prototype-inspired search layout with big poster results and a floating mode switch.</p>
+                    <p class="page-copy">Search results with poster-first browsing and a quick mode switch.</p>
                 </div>
                 <div class="page-actions search-feature-actions">
                     <a class="back-link" href="${buildPageUrl("home", { country: state.country })}">World Map</a>
@@ -877,7 +877,7 @@ function renderPeoplePage(root) {
                     </div>
                 </div>
                 <div class="star-list-grid">
-                    ${people.length ? people.map(person => renderStarListTile(person)).join("") : '<div class="empty-card">No stars are mocked for this country yet.</div>'}
+                    ${people.length ? people.map(person => renderStarListTile(person)).join("") : '<div class="empty-card">No featured stars are available for this country yet.</div>'}
                 </div>
             </section>
         </section>
@@ -887,7 +887,7 @@ function renderPeoplePage(root) {
 function renderMovieDetailPage(root) {
     const item = findMediaById(state.country, state.id, state.mediaType) || findMediaById(state.country, state.id);
     if (!item) {
-        root.innerHTML = renderNotFoundCard("Title not found", "The requested movie/show placeholder could not be found for this country.", buildPageUrl("movies", { country: state.country }));
+        root.innerHTML = renderNotFoundCard("Title not found", "The requested title could not be found for this country.", buildPageUrl("movies", { country: state.country }));
         return;
     }
     const relatedPeople = getRelatedPeopleForMedia(state.country, item);
@@ -928,7 +928,7 @@ function renderMovieDetailPage(root) {
                     <div class="detail-meta">
                         ${renderMediaPills(item)}
                     </div>
-                    <p class="detail-text">${escapeHtml(item.overview || "Placeholder summary for the static demo. This content exists to validate the contextual navigation flow, not the dataset.")}</p>
+                    <p class="detail-text">${escapeHtml(item.overview || "Discover story details, cast, and where to watch this title.")}</p>
                     <div class="providers-row">${renderProviderPills(item)}</div>
                     <div class="section-header">
                         <div>
@@ -937,7 +937,7 @@ function renderMovieDetailPage(root) {
                         </div>
                     </div>
                     <div class="cast-grid">
-                        ${relatedPeople.length ? relatedPeople.map(person => renderCastCard(person)).join("") : '<div class="empty-card">No actor/director placeholders are linked to this title yet.</div>'}
+                        ${relatedPeople.length ? relatedPeople.map(person => renderCastCard(person)).join("") : '<div class="empty-card">No cast or crew are listed for this title yet.</div>'}
                     </div>
                     <div class="detail-actions">
                         <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Open stars page</a>
@@ -951,7 +951,7 @@ function renderMovieDetailPage(root) {
 function renderPersonDetailPage(root) {
     const person = findPersonById(state.country, state.id);
     if (!person) {
-        root.innerHTML = renderNotFoundCard("Person not found", "The requested actor/director placeholder could not be found for this country.", buildPageUrl("people", { country: state.country }));
+        root.innerHTML = renderNotFoundCard("Person not found", "The requested person could not be found for this country.", buildPageUrl("people", { country: state.country }));
         return;
     }
     const relatedMedia = getRelatedMediaForPerson(state.country, person);
@@ -985,7 +985,7 @@ function renderPersonDetailPage(root) {
                 <section class="detail-card">
                     <p class="detail-kicker">${escapeHtml(person.role || "Creative")}</p>
                     <h3 class="detail-title">${escapeHtml(person.name)}</h3>
-                    <p class="detail-text">Static placeholder biography page for a country-specific star. The important interaction is the ability to jump from this person into their associated titles.</p>
+                    <p class="detail-text">Explore this star and jump directly into related titles.</p>
                     <div class="detail-actions">
                         <a class="primary-btn" href="${buildPageUrl("movies", { country: state.country })}">Open movies page</a>
                         <a class="secondary-btn" href="${buildPageUrl("home", { country: state.country })}">World map</a>
@@ -999,7 +999,7 @@ function renderPersonDetailPage(root) {
 function renderTheaterPage(root) {
     const item = findMediaById(state.country, state.id, state.mediaType) || findMediaById(state.country, state.id);
     if (!item) {
-        root.innerHTML = renderNotFoundCard("Theater map unavailable", "No title was selected for this theater-map placeholder page.", buildPageUrl("movies", { country: state.country }));
+        root.innerHTML = renderNotFoundCard("Theater map unavailable", "Select a title to view theater locations.", buildPageUrl("movies", { country: state.country }));
         return;
     }
     const theaters = buildTheatersForMedia(state.country, item);
@@ -1102,7 +1102,7 @@ function renderSettingsPage(root) {
                         <option value="French">French</option>
                         <option value="Japanese">Japanese</option>
                     </select>
-                    <span class="setting-help">Static demo preference only.</span>
+                    <span class="setting-help">Preference for your experience.</span>
                 </label>
                 <label class="setting-card">
                     <span class="setting-label">Default country</span>
@@ -1166,7 +1166,7 @@ function renderSettingsPage(root) {
                     <div class="section-header">
                         <div>
                             <h3>${currentSection.title}</h3>
-                            <p class="inline-note">Changes are stored in local storage for the demo.</p>
+                            <p class="inline-note">Changes are saved automatically.</p>
                         </div>
                     </div>
                     <div class="settings-grid settings-grid-page">
@@ -1194,10 +1194,10 @@ function renderMediaListCard(item) {
             <div>
                 <div class="content-card-top">
                     <h3>${escapeHtml(item.title)}</h3>
-                    <span class="rating-badge">${escapeHtml(item.rating || "Mocked")}</span>
+                    <span class="rating-badge">${escapeHtml(item.rating || "TBD")}</span>
                 </div>
                 <div class="info-row">${renderMediaPills(item)}</div>
-                <p>${escapeHtml(item.overview || "Placeholder summary for the static demo.")}</p>
+                <p>${escapeHtml(item.overview || "Discover story details and viewing options.")}</p>
                 <div class="content-card-footer">
                     <a class="inline-link" href="${buildMediaDetailUrl(item)}">Open detail</a>
                     ${renderProviderPills(item)}
@@ -1223,7 +1223,7 @@ function renderPersonCard(person) {
                     </div>
                     <span class="rating-badge">${renderRoleIcon(person.role)} Star</span>
                 </div>
-                <p>Static placeholder star page with contextual links back into titles.</p>
+                <p>Explore this star and move directly into related titles.</p>
                 <div class="known-for-row">
                     ${related.linked.slice(0, 3).map(item => `<a class="inline-link" href="${buildMediaDetailUrl(item)}">${escapeHtml(item.title)}</a>`).join("")}
                     ${related.unlinked.slice(0, 2).map(title => `<span class="known-for-pill">${escapeHtml(title)}</span>`).join("")}
@@ -1243,7 +1243,7 @@ function renderMiniMediaLink(item) {
             <div class="mini-link-icon">${renderMediaGlyph(item)}</div>
             <div>
                 <h4>${escapeHtml(item.title)}</h4>
-                <p>${escapeHtml(item.genre || "Placeholder genre")}</p>
+                <p>${escapeHtml(item.genre || "Featured genre")}</p>
             </div>
         </a>
     `;
@@ -1471,7 +1471,7 @@ function bindSettingsPageEvents() {
     if (saveButton) {
         saveButton.addEventListener("click", () => {
             if (!readSettingsInputs()) return;
-            if (status) status.textContent = "Saved to local storage.";
+            if (status) status.textContent = "Saved.";
         });
     }
 
@@ -1481,7 +1481,7 @@ function bindSettingsPageEvents() {
             populateSettingsInputs();
             saveSettings();
             applySettings();
-            if (status) status.textContent = "Reset to demo defaults.";
+            if (status) status.textContent = "Reset to recommended defaults.";
         });
     }
 }
@@ -1573,7 +1573,7 @@ function updateDocumentTitle() {
         theaters: "Theater Map",
         settings: "Settings",
     }[state.page] || "WorldView";
-    document.title = `${pageName} - ${entry.name} - WorldView Demo V2`;
+    document.title = `${pageName} - ${entry.name} - WorldView`;
 }
 
 function sanitizeCountry(code) {
@@ -1781,7 +1781,7 @@ function renderMediaPills(item) {
 
 function renderProviderPills(item) {
     if (!item.streaming || !item.streaming.length) {
-        return '<span class="provider-pill provider-default">Provider info mocked</span>';
+        return '<span class="provider-pill provider-default">Provider details coming soon</span>';
     }
     return item.streaming.map(provider => `<span class="provider-pill provider-${escapeHtml(provider.tag || "default")}">${escapeHtml(provider.name)}</span>`).join("");
 }

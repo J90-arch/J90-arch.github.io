@@ -271,7 +271,7 @@ const COUNTRY_OVERRIDES = {
             movies: [
                 { title: "Oppenheimer", year: 2023, genre: "Drama / History", rating: "8.5/10", overview: "A prestige historical drama that became a major global conversation piece and is easy for expats to use as shared cultural ground.", subtitles: ["English", "Dutch"] },
                 { title: "Inside Out 2", year: 2024, genre: "Animation / Family", rating: "7.6/10", overview: "A family-friendly global hit representing the kind of widely discussed mainstream release many Dutch audiences also encounter.", subtitles: ["English", "Dutch"] },
-                { title: "The Substance", year: 2024, genre: "Horror / Satire", rating: "7.3/10", overview: "A buzzy international title that fits the demo goal of discovering what people are currently talking about.", subtitles: ["English", "Dutch"] },
+                { title: "The Substance", year: 2024, genre: "Horror / Satire", rating: "7.3/10", overview: "A buzzy international title that helps spotlight what people are currently talking about.", subtitles: ["English", "Dutch"] },
             ],
             tvshows: [
                 { title: "Adolescence", year: 2025, genre: "Crime / Drama", rating: "8.3/10", overview: "A topical English-language limited series suited to expats looking for shared conversation starters.", subtitles: ["English", "Dutch"] },
@@ -287,7 +287,7 @@ const COUNTRY_OVERRIDES = {
             ],
             tvshows: [
                 { title: "Ferry", year: 2021, genre: "Crime / Drama", rating: "6.1/10", overview: "A Dutch crime series connected to the Undercover universe and recognizable to many local viewers.", originCountry: "NL" },
-                { title: "Ares", year: 2020, genre: "Horror / Drama", rating: "6.0/10", overview: "A Dutch-language horror series that gives the demo a clearly local option.", originCountry: "NL" },
+                { title: "Ares", year: 2020, genre: "Horror / Drama", rating: "6.0/10", overview: "A Dutch-language horror series that gives users a clearly local option.", originCountry: "NL" },
                 { title: "Undercover", year: 2019, genre: "Crime / Drama", rating: "7.8/10", overview: "A Dutch-Belgian crime drama useful for local-language discovery.", originCountry: "NL" },
             ],
         },
@@ -324,7 +324,7 @@ const COUNTRY_OVERRIDES = {
                 { title: "The Banshees of Inisherin", year: 2022, genre: "Drama / Comedy", rating: "7.7/10", overview: "A prestige title adjacent to British/Irish viewing culture and awards conversation.", subtitles: ["English"] },
             ],
             tvshows: [
-                { title: "Adolescence", year: 2025, genre: "Crime / Drama", rating: "8.3/10", overview: "A fresh UK conversation starter for the demo.", subtitles: ["English"] },
+                { title: "Adolescence", year: 2025, genre: "Crime / Drama", rating: "8.3/10", overview: "A fresh UK conversation starter.", subtitles: ["English"] },
                 { title: "Slow Horses", year: 2022, genre: "Thriller / Drama", rating: "8.2/10", overview: "A stylish British spy series that fits the app's culturally situated exploration.", subtitles: ["English"] },
                 { title: "Doctor Who", year: 2005, genre: "Sci-Fi / Adventure", rating: "8.6/10", overview: "An iconic British franchise that doubles as cultural literacy.", subtitles: ["English"] },
             ],
@@ -333,7 +333,7 @@ const COUNTRY_OVERRIDES = {
     KR: {
         popular: {
             movies: [
-                { title: "Exhuma", year: 2024, genre: "Horror / Mystery", rating: "7.0/10", overview: "A recent Korean hit that keeps the demo grounded in Korean theatrical culture.", originCountry: "KR" },
+                { title: "Exhuma", year: 2024, genre: "Horror / Mystery", rating: "7.0/10", overview: "A recent Korean hit that keeps the experience grounded in Korean theatrical culture.", originCountry: "KR" },
                 { title: "Parasite", year: 2019, genre: "Thriller / Drama", rating: "8.5/10", overview: "A global phenomenon that also serves as an entry point into Korean cinema.", originCountry: "KR" },
                 { title: "Decision to Leave", year: 2022, genre: "Romance / Thriller", rating: "7.4/10", overview: "A polished modern Korean thriller for culturally curious viewers.", originCountry: "KR" },
             ],

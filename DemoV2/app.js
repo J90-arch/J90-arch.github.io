@@ -279,7 +279,7 @@ function renderSelection() {
     document.getElementById("detail-flag").textContent = countryFlag(selectedCountry);
     document.getElementById("detail-country").textContent = entry.name;
     document.getElementById("detail-caption").textContent = panelVisible
-        ? "Static placeholder data for demo exploration"
+        ? "Browse featured titles and people"
         : "Country selected on the map";
     document.getElementById("detail-blurb").textContent = entry.blurb;
 
@@ -299,10 +299,10 @@ function renderDetailContent(entry) {
     if (currentType === "people") {
         collectionSwitch.classList.add("hidden");
         const people = entry.people || [];
-        status.textContent = `Static placeholder people list · ${people.length} entries`;
+        status.textContent = `Featured people · ${people.length} entries`;
 
         if (people.length === 0) {
-            content.innerHTML = `<div class="empty-card">No people are mocked for this country yet.</div>`;
+            content.innerHTML = `<div class="empty-card">No featured people are available for this country yet.</div>`;
             return;
         }
 
@@ -310,7 +310,7 @@ function renderDetailContent(entry) {
             <article class="person-card">
                 <h3>${escapeHtml(person.name)}</h3>
                 <div class="person-role">${escapeHtml(person.role || "Creative")}</div>
-                <p>Placeholder person data for browsing cultural figures.</p>
+                <p>Explore notable cultural figures and their work.</p>
                 <div class="known-for-row">
                     ${(person.knownFor || []).map(title => `<span class="known-for-pill">${escapeHtml(title)}</span>`).join("")}
                 </div>
@@ -322,10 +322,10 @@ function renderDetailContent(entry) {
     collectionSwitch.classList.remove("hidden");
     const list = (entry[currentCollection] && entry[currentCollection][currentType]) || [];
     const label = currentCollection === "popular" ? "popular" : "made here";
-    status.textContent = `Static placeholder ${label} list · ${list.length} ${currentType === "movies" ? "movies" : "TV shows"}`;
+    status.textContent = `${label} list · ${list.length} ${currentType === "movies" ? "movies" : "TV shows"}`;
 
     if (list.length === 0) {
-        content.innerHTML = `<div class="empty-card">No mocked ${currentType === "movies" ? "movies" : "TV shows"} for this view yet.</div>`;
+        content.innerHTML = `<div class="empty-card">No ${currentType === "movies" ? "movies" : "TV shows"} for this view yet.</div>`;
         return;
     }
 
@@ -344,8 +344,8 @@ function renderMediaCard(item) {
         .join("");
 
     const posterLabel = escapeHtml(item.title.split(/\s+/).slice(0, 3).join(" "));
-    const overview = escapeHtml(item.overview || "Placeholder summary for the static demo. This content exists to validate the app flow, not the dataset.");
-    const rating = escapeHtml(item.rating || "Mocked");
+    const overview = escapeHtml(item.overview || "Discover story details, cast, and where to watch this title.");
+    const rating = escapeHtml(item.rating || "TBD");
 
     return `
         <article class="content-card">
@@ -358,7 +358,7 @@ function renderMediaCard(item) {
                 <div class="info-row">${infoPills.join("")}</div>
                 <p>${overview}</p>
                 <div class="content-card-footer">
-                    ${providers || '<span class="provider-pill">Provider info mocked</span>'}
+                    ${providers || '<span class="provider-pill">Provider details coming soon</span>'}
                 </div>
             </div>
         </article>
@@ -502,12 +502,12 @@ function updateHero() {
     const hero = document.getElementById("hero-card");
     if (!selectedCountry) {
         hero.innerHTML = `
-            <p class="hero-kicker">Static GitHub Demo</p>
+            <p class="hero-kicker">WorldView</p>
             <h2>Explore stories by country</h2>
-            <p class="hero-text">Pick a country on the map or from the sidebar to browse placeholder popular titles, locally made titles, and notable people.</p>
+            <p class="hero-text">Pick a country on the map or from the sidebar to browse popular titles, local productions, and notable people.</p>
             <div class="hero-meta">
-                <span class="hero-pill">Local JS data</span>
-                <span class="hero-pill">LocalStorage settings</span>
+                <span class="hero-pill">Curated picks</span>
+                <span class="hero-pill">Personal settings</span>
                 <span class="hero-pill">No backend required</span>
             </div>
             <div class="hero-actions">

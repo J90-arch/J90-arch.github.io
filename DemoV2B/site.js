@@ -8,7 +8,6 @@ const DEFAULT_SETTINGS = {
     fontSize: "medium",
     language: "English",
     defaultCountry: "NL",
-    preferMadeIn: false,
 };
 const PAGE_FILES = {
     home: "map.html",
@@ -274,7 +273,6 @@ function renderHomeSidebar(header, container, searchQuery = "") {
         const matches = Object.entries(COUNTRY_CATALOG)
             .filter(([, entry]) => entry.name.toLowerCase().includes(query))
             .sort((a, b) => a[1].name.localeCompare(b[1].name))
-            .slice(0, 20)
             .map(([code]) => code);
         container.innerHTML = `
             ${searchBlock}
@@ -694,6 +692,24 @@ function getContinentForCountry(code) {
     return getContinentGroups().find(group => group.codes.includes(countryCode))?.id || getContinentGroups()[0]?.id || "europe";
 }
 
+function getContinentNameForCountry(code) {
+    const countryCode = sanitizeCountry(code);
+    return getContinentGroups().find(group => group.codes.includes(countryCode))?.name || "Other";
+}
+
+function buildCountrySearchMatches(query) {
+    const normalizedQuery = normalizeText(query);
+    if (!normalizedQuery) return [];
+
+    return getContinentGroups().flatMap(group =>
+        group.codes.filter(code => {
+            const entry = getCountryEntry(code);
+            const haystack = `${normalizeText(entry.name)} ${normalizeText(group.name)} ${String(code).toLowerCase()}`;
+            return haystack.includes(normalizedQuery);
+        })
+    );
+}
+
 function renderContinentCountryButton(code, continentName) {
     const entry = getCountryEntry(code);
     const counts = getCountryCountSummary(code);
@@ -763,8 +779,19 @@ function renderCountrySearchPage(root) {
             </section>
 
             <section class="country-search-layout">
-                <div class="continent-grid" id="continent-grid">
-                    ${getContinentGroups().map(renderContinentBlock).join("")}
+                <div>
+                    <section class="section-card country-search-results" id="country-search-results" hidden>
+                        <div class="country-search-results-header">
+                            <h3 class="sidebar-title">Search Results</h3>
+                            <span class="country-search-results-count" id="country-search-results-count"></span>
+                        </div>
+                        <div class="continent-country-grid country-search-results-grid" id="country-search-results-grid"></div>
+                    </section>
+
+                    <div class="continent-grid" id="continent-grid">
+                        ${getContinentGroups().map(renderContinentBlock).join("")}
+                    </div>
+
                     <div class="empty-card country-search-empty" id="country-search-empty" hidden>No countries match that search yet.</div>
                 </div>
 
@@ -798,31 +825,48 @@ function bindCountrySearchPageEvents() {
     input.focus({ preventScroll: true });
     input.setSelectionRange(input.value.length, input.value.length);
 
+    const pageRoot = document.getElementById("page-root");
+
     const applyFilter = () => {
         state.countrySearchQuery = input.value.trim();
-        const query = normalizeText(state.countrySearchQuery);
-        const continentCards = [...document.querySelectorAll("[data-continent-card]")];
         const selectedContinent = getContinentForCountry(state.country);
-        let visibleCountries = 0;
-
-        continentCards.forEach(card => {
-            const buttons = [...card.querySelectorAll("[data-alt-country]")];
-            let continentVisibleCount = 0;
-
-            buttons.forEach(button => {
-                const haystack = button.dataset.countrySearch || "";
-                const matches = !query || haystack.includes(query);
-                button.hidden = !matches;
-                if (matches) continentVisibleCount += 1;
-            });
-
-            card.hidden = continentVisibleCount === 0;
-            card.open = query ? continentVisibleCount > 0 : card.dataset.continentId === selectedContinent;
-            visibleCountries += continentVisibleCount;
-        });
-
+        const continentCards = [...document.querySelectorAll("[data-continent-card]")];
+        const continentGrid = document.getElementById("continent-grid");
+        const resultsPanel = document.getElementById("country-search-results");
+        const resultsGrid = document.getElementById("country-search-results-grid");
+        const resultsCount = document.getElementById("country-search-results-count");
         const emptyState = document.getElementById("country-search-empty");
-        if (emptyState) emptyState.hidden = visibleCountries > 0;
+        const matchingCodes = buildCountrySearchMatches(state.countrySearchQuery);
+
+        if (state.countrySearchQuery) {
+            if (resultsGrid) {
+                resultsGrid.innerHTML = matchingCodes
+                    .map(code => renderContinentCountryButton(code, getContinentNameForCountry(code)))
+                    .join("");
+            }
+            if (resultsCount) {
+                resultsCount.textContent = matchingCodes.length
+                    ? `${matchingCodes.length} match${matchingCodes.length === 1 ? "" : "es"}`
+                    : "";
+            }
+            if (resultsPanel) resultsPanel.hidden = matchingCodes.length === 0;
+            if (continentGrid) continentGrid.hidden = true;
+            if (emptyState) emptyState.hidden = matchingCodes.length > 0;
+            return;
+        }
+
+        if (resultsGrid) resultsGrid.innerHTML = "";
+        if (resultsCount) resultsCount.textContent = "";
+        if (resultsPanel) resultsPanel.hidden = true;
+        if (continentGrid) continentGrid.hidden = false;
+        continentCards.forEach(card => {
+            card.hidden = false;
+            card.open = card.dataset.continentId === selectedContinent;
+            card.querySelectorAll("[data-alt-country]").forEach(button => {
+                button.hidden = false;
+            });
+        });
+        if (emptyState) emptyState.hidden = true;
     };
 
     input.addEventListener("input", () => {
@@ -830,8 +874,10 @@ function bindCountrySearchPageEvents() {
         applyFilter();
     });
 
-    document.querySelectorAll("[data-alt-country]").forEach(button => {
-        button.addEventListener("click", () => {
+    if (pageRoot) {
+        pageRoot.addEventListener("click", event => {
+            const button = event.target.closest("[data-alt-country]");
+            if (!button || !pageRoot.contains(button)) return;
             const code = sanitizeCountry(button.dataset.altCountry);
             if (!code) return;
             state.country = code;
@@ -842,7 +888,7 @@ function bindCountrySearchPageEvents() {
             renderCountrySearchPage(document.getElementById("page-root"));
             bindCountrySearchPageEvents();
         });
-    });
+    }
 
     applyFilter();
 }

@@ -48,15 +48,15 @@ body[data-font-size="large"] { --font-scale: 1.08; }
 body[data-font-size="xlarge"] { --font-scale: 1.18; }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; height: 100%; }
+html, body { margin: 0; min-height: 100%; }
 body {
     font-family: Inter, "Segoe UI", system-ui, sans-serif;
     font-size: calc(16px * var(--font-scale));
     background: var(--bg);
     color: var(--text);
-    height: 100vh;
+    min-height: 100vh;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
 }
 button, input, select { font: inherit; }
 button { cursor: pointer; }
@@ -64,7 +64,6 @@ a { color: inherit; }
 
 .app-shell {
     min-height: 100vh;
-    height: 100vh;
     min-width: 1280px;
     display: flex;
     flex-direction: column;
@@ -227,10 +226,10 @@ a { color: inherit; }
 }
 
 .workspace {
-    flex: 1;
+    flex: 1 1 auto;
     display: grid;
     grid-template-columns: 272px minmax(0, 1fr);
-    min-height: 0;
+    min-height: max(40rem, calc(100vh - 7rem));
 }
 
 .workspace-wide {
@@ -243,7 +242,7 @@ a { color: inherit; }
     display: flex;
     flex-direction: column;
     min-height: 0;
-    overflow-y: auto;
+    overflow: visible;
 }
 
 .sidebar-header,
@@ -642,7 +641,7 @@ a { color: inherit; }
     display: flex;
     flex-direction: column;
     min-height: 0;
-    overflow-y: auto;
+    overflow: visible;
     padding: 1.2rem 1.4rem 1.4rem;
 }
 
@@ -1189,15 +1188,14 @@ a { color: inherit; }
 
 .focus-shell {
     min-height: 100vh;
-    height: 100vh;
     min-width: 1280px;
     display: flex;
     flex-direction: column;
 }
 
 .focus-main {
-    flex: 1;
-    overflow-y: auto;
+    flex: 1 1 auto;
+    overflow: visible;
     padding: 1.2rem 1.4rem 1.4rem;
 }
 
@@ -1434,6 +1432,34 @@ a { color: inherit; }
     grid-template-columns: minmax(0, 1fr) 20rem;
     gap: 1.2rem;
     align-items: start;
+}
+
+.country-search-results {
+    display: grid;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.country-search-results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.country-search-results-header .sidebar-title {
+    margin: 0;
+}
+
+.country-search-results-count {
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.country-search-results-grid {
+    padding: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .continent-grid {

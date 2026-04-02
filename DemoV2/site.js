@@ -683,16 +683,6 @@ function renderHomePage(root) {
     updateHomeHero();
     bindHomeMapTools();
 }
-
-const CONTINENT_COUNTRY_GROUPS = [
-    { id: "europe", name: "Europe", codes: ["NL", "GB", "FR", "ES", "DE", "IT", "SE", "TR", "RU"] },
-    { id: "asia", name: "Asia", codes: ["JP", "KR", "IN"] },
-    { id: "north-america", name: "North America", codes: ["US", "CA", "MX"] },
-    { id: "south-america", name: "South America", codes: ["BR"] },
-    { id: "africa", name: "Africa", codes: ["NG"] },
-    { id: "oceania", name: "Oceania", codes: ["AU"] },
-];
-
 function getCountryCountSummary(code) {
     const entry = getCountryEntry(code);
     return {
@@ -703,7 +693,7 @@ function getCountryCountSummary(code) {
 }
 
 function getContinentGroups() {
-    return CONTINENT_COUNTRY_GROUPS
+    return TMDB_CONTINENT_COUNTRY_GROUPS
         .map(group => ({ ...group, codes: group.codes.filter(code => COUNTRY_CATALOG[code]) }))
         .filter(group => group.codes.length);
 }

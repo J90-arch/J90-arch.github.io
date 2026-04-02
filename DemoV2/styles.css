@@ -95,6 +95,11 @@ a { color: inherit; }
     align-items: flex-start;
 }
 
+.brand-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .brand {
     display: flex;
     align-items: center;
@@ -508,10 +513,20 @@ a { color: inherit; }
     overflow: hidden;
 }
 
+.map-page {
+    background: linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+}
+
 .map-page #world-map {
     width: 100%;
     height: 100%;
     display: block;
+}
+
+.map-page #world-map path.country {
+    fill: #ffffff;
+    stroke: #aebcca;
+    stroke-width: 0.7;
 }
 
 #world-map path.country {
@@ -522,7 +537,9 @@ a { color: inherit; }
     transition: fill 0.16s ease, stroke 0.16s ease;
 }
 
+.map-page #world-map path.country:hover { fill: #dde8f2; }
 #world-map path.country:hover { fill: var(--panel-3); }
+.map-page #world-map path.country.highlighted,
 #world-map path.country.highlighted {
     fill: var(--accent);
     stroke: var(--accent-2);
@@ -549,8 +566,42 @@ a { color: inherit; }
     right: 1.25rem;
     z-index: 10;
     left: auto;
-    width: 18rem;
+    width: 16.5rem;
     padding: 1rem 1rem 0.95rem;
+}
+
+.map-panel-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    margin-left: auto;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--panel-2) 90%, transparent);
+    color: var(--muted);
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+}
+
+.map-controls {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 10;
+    display: grid;
+    gap: 0.55rem;
+}
+
+.map-control-btn {
+    background: rgba(255, 255, 255, 0.94);
+    color: #10202d;
+    border-color: rgba(16, 32, 45, 0.14);
+    box-shadow: var(--shadow);
 }
 
 .hero-card h2,
@@ -730,7 +781,7 @@ a { color: inherit; }
 
 .summary-strip {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
 }
 
@@ -1107,6 +1158,7 @@ a { color: inherit; }
     border: 1px solid var(--border);
     border-radius: 1rem;
     padding: 1rem;
+    align-content: start;
 }
 
 .checkbox-card {
@@ -1279,9 +1331,9 @@ a { color: inherit; }
 
 .settings-status {
     margin: 0 auto 0 0;
-    color: var(--accent);
+    color: var(--muted);
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .settings-section-nav {
@@ -1330,4 +1382,201 @@ a { color: inherit; }
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+.country-search-page {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.country-search-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(24rem, 34rem);
+    gap: 1.2rem;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 4;
+}
+
+.country-search-hero-copy {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.country-search-big {
+    display: grid;
+    gap: 0.7rem;
+    padding: 1rem;
+    border-radius: 1.2rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+    background: color-mix(in srgb, var(--panel-2) 82%, var(--accent) 18%);
+}
+
+.country-search-big input {
+    width: 100%;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    padding: 1.15rem 1.2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.country-search-big input:focus {
+    outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    border-color: var(--accent);
+}
+
+.country-search-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    gap: 1.2rem;
+    align-items: start;
+}
+
+.continent-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-content: start;
+}
+
+.continent-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 1.2rem;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.continent-card summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    cursor: pointer;
+    background: var(--panel-2);
+}
+
+.continent-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.continent-summary-side {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.continent-card summary h3 {
+    margin: 0.2rem 0 0;
+    font-size: 1.05rem;
+}
+
+.continent-toggle {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid var(--border);
+    background: var(--panel-3);
+    color: var(--muted);
+    transition: transform 0.18s ease;
+}
+
+.continent-card[open] .continent-toggle {
+    transform: rotate(180deg);
+}
+
+.continent-country-grid {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.continent-country-btn {
+    appearance: none;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    transition: 0.18s ease;
+}
+
+.continent-country-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent);
+}
+
+.continent-country-btn.active {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, var(--panel-2));
+}
+
+.continent-country-flag {
+    font-size: 1.6rem;
+    line-height: 1;
+    flex: 0 0 auto;
+}
+
+.continent-country-copy {
+    display: grid;
+    gap: 0.18rem;
+}
+
+.continent-country-copy strong {
+    font-size: 0.96rem;
+}
+
+.continent-country-copy span {
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.country-search-side {
+    display: grid;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+}
+
+.country-search-side-card {
+    padding: 1.15rem 1.2rem;
+}
+
+.country-search-side-actions {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.country-search-map-btn,
+.country-search-side-actions .secondary-btn {
+    width: 100%;
+}
+
+.country-search-empty {
+    grid-column: 1 / -1;
+}
+
+.settings-reset-inline {
+    width: 100%;
+    min-height: 3.2rem;
+}
+
+.settings-grid-page .setting-card {
+    min-height: 8.4rem;
 }

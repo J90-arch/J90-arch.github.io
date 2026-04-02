@@ -63,7 +63,7 @@ function syncStateFromUrl() {
         || "NL";
     state.collection = ["popular", "madeIn"].includes(params.get("collection"))
         ? params.get("collection")
-        : (state.settings.preferMadeIn ? "madeIn" : "popular");
+        : "popular";
     state.mediaType = ["movies", "tvshows"].includes(params.get("type")) ? params.get("type") : "movies";
     state.searchScope = ["movies", "people", "all"].includes(params.get("scope")) ? params.get("scope") : defaultSearchScope();
     state.roleFilter = ["all", "actor", "director"].includes(params.get("role")) ? params.get("role") : "all";
@@ -121,15 +121,7 @@ function showMainSidebar() {
 }
 
 function getShellTitle() {
-    return {
-        home: "World Map",
-        countrySearch: "Country Search",
-        search: "Search",
-        movies: "Popular Movies",
-        people: "Popular Stars",
-        movie: "Title",
-        person: "Title",
-    }[state.page] || "WorldView";
+    return "WorldView";
 }
 
 function getShellSubtitle() {
@@ -168,27 +160,27 @@ function renderShell() {
         <div class="app-shell">
             <header class="topbar">
                 <div class="topbar-shell">
-                    <div class="brand shell-brand">
+                    <a class="brand shell-brand brand-link" href="${buildPageUrl("countrySearch", { country: state.country, countryq: state.countrySearchQuery })}" aria-label="Open WorldView country search">
                         <div class="brand-mark">✦</div>
                         <div class="shell-brand-copy">
                             <h1>${escapeHtml(getShellTitle())}</h1>
                             <p>${escapeHtml(getShellSubtitle())}</p>
                         </div>
-                    </div>
+                    </a>
                     <div class="topbar-center">
                         <form class="page-search shell-search" id="global-search-form">
-                            <input type="text" id="global-search-input" placeholder="Search titles or stars..." value="${escapeHtml(state.search)}">
+                            <input type="text" id="global-search-input" placeholder="Search titles or celebs..." value="${escapeHtml(state.search)}">
                             <select id="global-search-scope">
                                 <option value="movies" ${defaultSearchScope() === "movies" ? "selected" : ""}>Titles</option>
-                                <option value="people" ${defaultSearchScope() === "people" ? "selected" : ""}>Stars</option>
+                                <option value="people" ${defaultSearchScope() === "people" ? "selected" : ""}>Celebs</option>
                             </select>
                             <button class="primary-btn" type="submit">Search</button>
                         </form>
                         <nav class="topnav" aria-label="Primary">
-                            ${renderNavLink("home", "World Map")}
+                            ${renderNavLink("countrySearch", "Country Search")}
+                            ${renderNavLink("home", "Country Selection")}
                             ${renderNavLink("movies", "Popular Movies")}
-                            ${renderNavLink("people", "Popular Stars")}
-                            ${renderNavLink("search", "Search")}
+                            ${renderNavLink("people", "Popular Celebs")}
                         </nav>
                     </div>
                     <a class="header-settings-btn" id="open-settings-btn" aria-label="Open settings" href="${buildPageUrl("settings", { country: state.country })}">Settings</a>
@@ -247,7 +239,7 @@ function renderSidebar(searchQuery = "") {
             break;
         default:
             header.innerHTML = `<div><h2>Navigation</h2><p>Browse the main sections of WorldView.</p></div>`;
-            container.innerHTML = `<div class="sidebar-group sidebar-links">${renderSidebarLink("World Map", buildPageUrl("home", { country: state.country }))}</div>`;
+            container.innerHTML = `<div class="sidebar-group sidebar-links">${renderSidebarLink("Country Selection", buildPageUrl("home", { country: state.country }))}</div>`;
     }
 
     bindSidebarInteractions();
@@ -256,8 +248,8 @@ function renderSidebar(searchQuery = "") {
 function renderHomeSidebar(header, container, searchQuery = "") {
     header.innerHTML = `
         <div>
-            <h2>Find Country</h2>
-            <p>Start from the world map or choose a country directly from the sidebar.</p>
+            <h2>Country Selection</h2>
+            <p>Choose a country from the map or open the focused country-search flow.</p>
         </div>
     `;
 
@@ -274,7 +266,7 @@ function renderHomeSidebar(header, container, searchQuery = "") {
 
     const alternateSearchLink = `
         <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Alternative Country Search", buildPageUrl("countrySearch", { country: state.country, countryq: searchQuery }))}
+            ${renderSidebarLink("Open Country Search", buildPageUrl("countrySearch", { country: state.country, countryq: searchQuery }))}
         </section>
     `;
 
@@ -319,13 +311,13 @@ function renderCountrySearchSidebar(header, container) {
     header.innerHTML = `
         <div>
             <h2>Country Search</h2>
-            <p>Alternative start page focused on search first, then continent browsing.</p>
+            <p>Focused country search with expandable continents and quick access to the map.</p>
         </div>
     `;
 
     container.innerHTML = `
         <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Back to World Map", buildPageUrl("home", { country: state.country }))}
+            ${renderSidebarLink("Open Country Selection", buildPageUrl("home", { country: state.country }))}
         </section>
     `;
 }
@@ -334,7 +326,7 @@ function renderMoviesSidebar(header, container) {
     header.innerHTML = `
         <div>
             <h2>Movie Exploration</h2>
-            <p>The graph treats this as its own exploration page, with contextual links into title and person pages.</p>
+            <p>Browse popular titles or titles made in the selected country.</p>
         </div>
     `;
 
@@ -358,21 +350,6 @@ function renderMoviesSidebar(header, container) {
                 ${renderTypeLink("tvshows", "TV Shows")}
             </div>
         </section>
-        <section class="sidebar-group">
-            <span class="sidebar-label">Search Titles</span>
-            <form class="sidebar-form" action="movies.html">
-                <input type="hidden" name="country" value="${escapeHtml(state.country)}">
-                <input type="hidden" name="collection" value="${escapeHtml(state.collection)}">
-                <input type="hidden" name="type" value="${escapeHtml(state.mediaType)}">
-                <input type="text" name="q" placeholder="Search titles..." value="${escapeHtml(state.search)}">
-                <button class="primary-btn" type="submit">Search</button>
-            </form>
-        </section>
-        <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Reset Filters", buildPageUrl("movies", { country: state.country, collection: state.collection, type: state.mediaType }))}
-            ${renderSidebarLink("Open Stars Exploration", buildPageUrl("people", { country: state.country }))}
-            ${renderSidebarLink("Back to World Map", buildPageUrl("home", { country: state.country }))}
-        </section>
     `;
 }
 
@@ -394,7 +371,7 @@ function renderSearchSidebar(header, container) {
             <div class="sidebar-chip-row">
                 ${renderSearchScopeLink("all", "All")}
                 ${renderSearchScopeLink("movies", "Titles")}
-                ${renderSearchScopeLink("people", "Stars")}
+                ${renderSearchScopeLink("people", "Celebs")}
             </div>
         </section>
         <section class="sidebar-group">
@@ -411,13 +388,13 @@ function renderSearchSidebar(header, container) {
                 <input type="hidden" name="country" value="${escapeHtml(state.country)}">
                 <input type="hidden" name="scope" value="${escapeHtml(state.searchScope)}">
                 <input type="hidden" name="role" value="${escapeHtml(state.roleFilter)}">
-                <input type="text" name="q" placeholder="Search titles or stars..." value="${escapeHtml(state.search)}">
+                <input type="text" name="q" placeholder="Search titles or celebs..." value="${escapeHtml(state.search)}">
                 <button class="primary-btn" type="submit">Search</button>
             </form>
         </section>
         <section class="sidebar-group sidebar-links">
             ${renderSidebarLink("Open Movie Exploration", buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" }))}
-            ${renderSidebarLink("Open Stars Exploration", buildPageUrl("people", { country: state.country }))}
+            ${renderSidebarLink("Open Celeb Exploration", buildPageUrl("people", { country: state.country }))}
         </section>
     `;
 }
@@ -425,7 +402,7 @@ function renderSearchSidebar(header, container) {
 function renderPeopleSidebar(header, container) {
     header.innerHTML = `
         <div>
-            <h2>Stars Exploration</h2>
+            <h2>Celeb Exploration</h2>
             <p>Browse actors and directors, then jump into related titles through contextual links.</p>
         </div>
     `;
@@ -444,18 +421,13 @@ function renderPeopleSidebar(header, container) {
             </div>
         </section>
         <section class="sidebar-group">
-            <span class="sidebar-label">Search Stars</span>
+            <span class="sidebar-label">Search Celebs</span>
             <form class="sidebar-form" action="people.html">
                 <input type="hidden" name="country" value="${escapeHtml(state.country)}">
                 <input type="hidden" name="role" value="${escapeHtml(state.roleFilter)}">
                 <input type="text" name="q" placeholder="Search actors or directors..." value="${escapeHtml(state.search)}">
                 <button class="primary-btn" type="submit">Search</button>
             </form>
-        </section>
-        <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Reset Filters", buildPageUrl("people", { country: state.country, role: state.roleFilter }))}
-            ${renderSidebarLink("Open Movie Exploration", buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" }))}
-            ${renderSidebarLink("Back to World Map", buildPageUrl("home", { country: state.country }))}
         </section>
     `;
 }
@@ -469,14 +441,13 @@ function renderMovieSidebar(header, container) {
     header.innerHTML = `
         <div>
             <h2>Title Context</h2>
-            <p>Movie description pages keep navigation visible and branch into stars or cinema map pages.</p>
+            <p>Movie description pages keep navigation visible and branch into celeb or cinema map pages.</p>
         </div>
     `;
 
     container.innerHTML = `
         <section class="sidebar-group sidebar-links">
             ${renderSidebarLink("Back to Movies", buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" }))}
-            ${renderSidebarLink("Open Stars Exploration", buildPageUrl("people", { country: state.country }))}
             ${item ? renderSidebarLink("Open Theater Map", buildPageUrl("theaters", { country: state.country, id: item.id, type: item.type, collection: item.collection })) : ""}
         </section>
         <section class="sidebar-group">
@@ -501,9 +472,7 @@ function renderPersonSidebar(header, container) {
 
     container.innerHTML = `
         <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Back to Stars", buildPageUrl("people", { country: state.country }))}
-            ${renderSidebarLink("Open Movie Exploration", buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" }))}
-            ${renderSidebarLink("Back to World Map", buildPageUrl("home", { country: state.country }))}
+            ${renderSidebarLink("Back to Celebs", buildPageUrl("people", { country: state.country }))}
         </section>
         <section class="sidebar-group">
             <h3 class="sidebar-title">Known For</h3>
@@ -534,8 +503,6 @@ function renderTheaterSidebar(header, container) {
         </section>
         <section class="sidebar-group sidebar-links">
             ${item ? renderSidebarLink("Back to Title", buildMediaDetailUrl(item)) : ""}
-            ${renderSidebarLink("Open Movie Exploration", buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" }))}
-            ${renderSidebarLink("Back to World Map", buildPageUrl("home", { country: state.country }))}
         </section>
     `;
 }
@@ -580,7 +547,7 @@ function renderCountryCard(code) {
             <div class="country-meta">
                 <span class="meta-pill">${popularCount} popular</span>
                 <span class="meta-pill">${madeInCount} local</span>
-                <span class="meta-pill">${peopleCount} stars</span>
+                <span class="meta-pill">${peopleCount} celebs</span>
             </div>
         </div>
     `;
@@ -600,6 +567,7 @@ function bindHomeCountryButtons() {
             updateUrlWithoutNavigation(buildPageUrl("home", { country: state.country }));
             renderSidebar(document.getElementById("country-search").value.trim());
             updateHomeHero();
+            bindHomeMapTools();
             refreshShellTargets();
             highlightMapCountry(state.country);
             updateDocumentTitle();
@@ -681,6 +649,11 @@ async function hydrateLivePeople() {
 function renderHomePage(root) {
     root.innerHTML = `
         <div class="hero-card map-selection-panel" id="home-hero"></div>
+        <div class="map-controls" aria-label="Map controls">
+            <button class="icon-btn map-control-btn" id="map-zoom-in" type="button" aria-label="Zoom in">＋</button>
+            <button class="icon-btn map-control-btn" id="map-zoom-out" type="button" aria-label="Zoom out">－</button>
+            <button class="icon-btn map-control-btn" id="map-zoom-reset" type="button" aria-label="Reset zoom">⟲</button>
+        </div>
         <svg id="world-map" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet"></svg>
         <div class="map-tooltip" id="tooltip"></div>
     `;
@@ -689,6 +662,7 @@ function renderHomePage(root) {
     bindMapInteractions();
     highlightMapCountry(state.country);
     updateHomeHero();
+    bindHomeMapTools();
 }
 
 const CONTINENT_COUNTRY_GROUPS = [
@@ -736,7 +710,7 @@ function renderContinentCountryButton(code, continentName) {
             <span class="continent-country-flag">${countryFlag(code)}</span>
             <span class="continent-country-copy">
                 <strong>${escapeHtml(entry.name)}</strong>
-                <span>${counts.popular} popular · ${counts.madeIn} local · ${counts.people} stars</span>
+                <span>${counts.popular} popular · ${counts.madeIn} local · ${counts.people} celebs</span>
             </span>
         </button>
     `;
@@ -751,7 +725,10 @@ function renderContinentBlock(group) {
                     <p class="page-kicker">${group.codes.length} countries</p>
                     <h3>${escapeHtml(group.name)}</h3>
                 </div>
-                <span class="meta-pill">${group.codes.length}</span>
+                <div class="continent-summary-side">
+                    <span class="meta-pill">${group.codes.length}</span>
+                    <span class="continent-toggle" aria-hidden="true">⌄</span>
+                </div>
             </summary>
             <div class="continent-country-grid">
                 ${group.codes.map(code => renderContinentCountryButton(code, group.name)).join("")}
@@ -799,14 +776,15 @@ function renderCountrySearchPage(root) {
                         <div class="hero-meta">
                             <span class="hero-pill">${counts.popular} popular titles</span>
                             <span class="hero-pill">${counts.madeIn} locally made titles</span>
-                            <span class="hero-pill">${counts.people} stars</span>
+                            <span class="hero-pill">${counts.people} celebs</span>
                         </div>
                     </section>
 
                     <div class="country-search-side-actions">
                         <a class="primary-btn country-search-map-btn" href="${buildPageUrl("home", { country: state.country })}">Open Map</a>
                         <a class="secondary-btn" href="${buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" })}">Popular Movies</a>
-                        <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Popular Stars</a>
+                        <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Popular Celebs</a>
+                        <a class="secondary-btn" href="${buildPageUrl("settings", { country: state.country })}">Settings</a>
                     </div>
                 </aside>
             </section>
@@ -817,6 +795,8 @@ function renderCountrySearchPage(root) {
 function bindCountrySearchPageEvents() {
     const input = document.getElementById("country-alt-search");
     if (!input) return;
+    input.focus({ preventScroll: true });
+    input.setSelectionRange(input.value.length, input.value.length);
 
     const applyFilter = () => {
         state.countrySearchQuery = input.value.trim();
@@ -876,20 +856,84 @@ function updateHomeHero() {
     const peopleCount = listPeople(state.country).length;
 
     hero.innerHTML = `
+        <div class="map-panel-handle" id="home-hero-handle" aria-label="Drag selected country panel" title="Drag panel">⋮⋮</div>
         <p class="page-kicker">Selected Country</p>
         <h2>${countryFlag(state.country)} ${escapeHtml(entry.name)}</h2>
         <p class="hero-text">${escapeHtml(entry.blurb)}</p>
         <div class="hero-meta">
             <span class="hero-pill">${popularCount} popular titles</span>
             <span class="hero-pill">${madeInCount} locally made titles</span>
-            <span class="hero-pill">${peopleCount} stars</span>
+            <span class="hero-pill">${peopleCount} celebs</span>
         </div>
         <div class="hero-actions">
-            <a class="primary-btn" href="${buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" })}">Browse movies</a>
-            <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Browse stars</a>
+            <a class="secondary-btn" href="${buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" })}">Browse movies</a>
+            <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Browse celebs</a>
             <a class="secondary-btn" href="${buildPageUrl("settings", { country: state.country })}">Settings</a>
         </div>
     `;
+}
+
+function bindHomeMapTools() {
+    const svgNode = document.getElementById("world-map");
+    const zoomBehavior = svgNode?.__mapZoomBehavior;
+    if (svgNode && zoomBehavior && typeof d3 !== "undefined") {
+        const svg = d3.select(svgNode);
+        const zoomIn = document.getElementById("map-zoom-in");
+        const zoomOut = document.getElementById("map-zoom-out");
+        const zoomReset = document.getElementById("map-zoom-reset");
+        if (zoomIn && !zoomIn.dataset.bound) {
+            zoomIn.dataset.bound = "1";
+            zoomIn.addEventListener("click", () => {
+                svg.transition().duration(180).call(zoomBehavior.scaleBy, 1.35);
+            });
+        }
+        if (zoomOut && !zoomOut.dataset.bound) {
+            zoomOut.dataset.bound = "1";
+            zoomOut.addEventListener("click", () => {
+                svg.transition().duration(180).call(zoomBehavior.scaleBy, 0.74);
+            });
+        }
+        if (zoomReset && !zoomReset.dataset.bound) {
+            zoomReset.dataset.bound = "1";
+            zoomReset.addEventListener("click", () => {
+                svg.transition().duration(180).call(zoomBehavior.transform, d3.zoomIdentity);
+            });
+        }
+    }
+
+    const panel = document.getElementById("home-hero");
+    const handle = document.getElementById("home-hero-handle");
+    const stage = document.getElementById("page-root");
+    if (!panel || !handle || !stage) return;
+
+    handle.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        const stageRect = stage.getBoundingClientRect();
+        const panelRect = panel.getBoundingClientRect();
+        const offsetX = event.clientX - panelRect.left;
+        const offsetY = event.clientY - panelRect.top;
+
+        panel.style.right = "auto";
+        panel.style.left = `${panelRect.left - stageRect.left}px`;
+        panel.style.top = `${panelRect.top - stageRect.top}px`;
+
+        const onMove = (moveEvent) => {
+            const maxLeft = Math.max(0, stageRect.width - panelRect.width);
+            const maxTop = Math.max(0, stageRect.height - panelRect.height);
+            const nextLeft = Math.min(Math.max(0, moveEvent.clientX - stageRect.left - offsetX), maxLeft);
+            const nextTop = Math.min(Math.max(0, moveEvent.clientY - stageRect.top - offsetY), maxTop);
+            panel.style.left = `${nextLeft}px`;
+            panel.style.top = `${nextTop}px`;
+        };
+
+        const stop = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", stop);
+        };
+
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", stop);
+    });
 }
 
 
@@ -925,8 +969,10 @@ function bindMapInteractions() {
         state.country = code;
         persistSelectedCountry();
         updateUrlWithoutNavigation(buildPageUrl("home", { country: state.country }));
-        renderSidebar(document.getElementById("country-search").value.trim());
+        const countrySearch = document.getElementById("country-search");
+        renderSidebar(countrySearch ? countrySearch.value.trim() : "");
         updateHomeHero();
+        bindHomeMapTools();
         refreshShellTargets();
         highlightMapCountry(state.country);
         updateDocumentTitle();
@@ -955,9 +1001,6 @@ function renderMoviesPage(root) {
                     <h2 class="page-title">${countryFlag(state.country)} ${escapeHtml(entry.name)} · ${state.collection === "popular" ? "Popular Titles" : "Made In Country"}</h2>
                     <p class="page-copy">Separate title-exploration page, consistent with the report's contextual architecture and list-page flow.</p>
                 </div>
-                <div class="page-actions">
-                    <a class="back-link" href="${buildPageUrl("home", { country: state.country })}">World Map</a>
-                </div>
             </div>
             <div class="page-toolbar">
                 <div class="toolbar-group">
@@ -974,7 +1017,7 @@ function renderMoviesPage(root) {
                 <div class="section-header">
                     <div>
                         <h3>${items.length} results</h3>
-                        <p class="inline-note">Click a title to open a separate detail page. Related stars link into the stars flow.</p>
+                        <p class="inline-note">Click a title to open a separate detail page. Related celebs link into the celeb flow.</p>
                     </div>
                 </div>
                 <div class="poster-list-grid">
@@ -1009,12 +1052,12 @@ function renderSearchPage(root) {
         <section class="section-card">
             <div class="section-header">
                 <div>
-                    <h3>${peopleResults.length} star results</h3>
+                    <h3>${peopleResults.length} celeb results</h3>
                     <p class="inline-note">Person results link directly into person detail pages, which can then link back into titles.</p>
                 </div>
             </div>
             <div class="person-grid">
-                ${peopleResults.length ? peopleResults.map(person => renderPersonCard(person)).join("") : '<div class="empty-card">No stars matched this query.</div>'}
+                ${peopleResults.length ? peopleResults.map(person => renderPersonCard(person)).join("") : '<div class="empty-card">No celebs matched this query.</div>'}
             </div>
         </section>
     `;
@@ -1028,7 +1071,6 @@ function renderSearchPage(root) {
                     <p class="page-copy">Search results with poster-first browsing and a quick mode switch.</p>
                 </div>
                 <div class="page-actions search-feature-actions">
-                    <a class="back-link" href="${buildPageUrl("home", { country: state.country })}">World Map</a>
                     ${state.searchScope !== "people" ? renderSearchCollectionCard() : ""}
                 </div>
             </div>
@@ -1036,7 +1078,7 @@ function renderSearchPage(root) {
                 <div class="toolbar-group">
                     ${renderSearchScopeLink("all", "All Results")}
                     ${renderSearchScopeLink("movies", "Titles")}
-                    ${renderSearchScopeLink("people", "Stars")}
+                    ${renderSearchScopeLink("people", "Celebs")}
                     ${renderRoleLink("search", "all", "All Roles")}
                     ${renderRoleLink("search", "actor", "Actors")}
                     ${renderRoleLink("search", "director", "Directors")}
@@ -1062,17 +1104,14 @@ function renderPeoplePage(root) {
         <section class="page-header">
             <div class="page-header-top">
                 <div>
-                    <p class="page-kicker">Stars Exploration</p>
-                    <h2 class="page-title">${countryFlag(state.country)} ${escapeHtml(entry.name)} · Popular Stars</h2>
-                    <p class="page-copy">Separate stars exploration page. From here, users can jump into titles through country-specific actors and directors.</p>
-                </div>
-                <div class="page-actions">
-                    <a class="back-link" href="${buildPageUrl("home", { country: state.country })}">World Map</a>
+                    <p class="page-kicker">Celeb Exploration</p>
+                    <h2 class="page-title">${countryFlag(state.country)} ${escapeHtml(entry.name)} · Popular Celebs</h2>
+                    <p class="page-copy">Separate celeb exploration page. From here, users can jump into titles through country-specific actors and directors.</p>
                 </div>
             </div>
             <div class="page-toolbar">
                 <div class="toolbar-group">
-                    <a class="nav-link active" href="${buildPageUrl("people", { country: state.country })}">Stars</a>
+                    <a class="nav-link active" href="${buildPageUrl("people", { country: state.country })}">Celebs</a>
                     ${renderRoleLink("people", "all", "All Roles")}
                     ${renderRoleLink("people", "actor", "Actors")}
                     ${renderRoleLink("people", "director", "Directors")}
@@ -1086,11 +1125,11 @@ function renderPeoplePage(root) {
                 <div class="section-header">
                     <div>
                         <h3>${people.length} results</h3>
-                        <p class="inline-note">Star cards link to separate person pages. Known-for titles link back into movie detail pages.</p>
+                        <p class="inline-note">Celeb cards link to separate person pages. Known-for titles link back into movie detail pages.</p>
                     </div>
                 </div>
                 <div class="star-list-grid">
-                    ${people.length ? people.map(person => renderStarListTile(person)).join("") : '<div class="empty-card">No featured stars are available for this country yet.</div>'}
+                    ${people.length ? people.map(person => renderStarListTile(person)).join("") : '<div class="empty-card">No featured celebs are available for this country yet.</div>'}
                 </div>
             </section>
         </section>
@@ -1114,7 +1153,7 @@ function renderMovieDetailPage(root) {
                 <div>
                     <p class="page-kicker">Title Detail</p>
                     <h2 class="page-title">${escapeHtml(item.title)}</h2>
-                    <p class="page-copy">Separate item page with contextual links to stars and theater information.</p>
+                    <p class="page-copy">Separate item page with contextual links to celebs and theater information.</p>
                 </div>
                 <div class="page-actions">
                     <a class="back-link" href="${buildPageUrl("movies", { country: state.country, collection: item.collection || state.collection, type: item.type || state.mediaType })}">Back to Movies</a>
@@ -1152,9 +1191,6 @@ function renderMovieDetailPage(root) {
                     <div class="cast-grid">
                         ${relatedPeople.length ? relatedPeople.map(person => renderCastCard(person)).join("") : '<div class="empty-card">No cast or crew are listed for this title yet.</div>'}
                     </div>
-                    <div class="detail-actions">
-                        <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Open stars page</a>
-                    </div>
                 </section>
             </div>
         </div>
@@ -1177,7 +1213,7 @@ function renderPersonDetailPage(root) {
                     <p class="page-copy">Separate person page with contextual links back into title detail pages.</p>
                 </div>
                 <div class="page-actions">
-                    <a class="back-link" href="${buildPageUrl("people", { country: state.country })}">Back to Stars</a>
+                    <a class="back-link" href="${buildPageUrl("people", { country: state.country })}">Back to Celebs</a>
                 </div>
             </div>
         </section>
@@ -1198,10 +1234,9 @@ function renderPersonDetailPage(root) {
                 <section class="detail-card">
                     <p class="detail-kicker">${escapeHtml(person.role || "Creative")}</p>
                     <h3 class="detail-title">${escapeHtml(person.name)}</h3>
-                    <p class="detail-text">Explore this star and jump directly into related titles.</p>
+                    <p class="detail-text">Explore this celeb and jump directly into related titles.</p>
                     <div class="detail-actions">
-                        <a class="primary-btn" href="${buildPageUrl("movies", { country: state.country })}">Open movies page</a>
-                        <a class="secondary-btn" href="${buildPageUrl("home", { country: state.country })}">World map</a>
+                        <a class="secondary-btn" href="${buildPageUrl("movies", { country: state.country })}">Browse movies</a>
                     </div>
                 </section>
             </div>
@@ -1224,7 +1259,7 @@ function renderTheaterPage(root) {
                     <div>
                         <p class="page-kicker">Theater Map</p>
                         <h2 class="page-title">${escapeHtml(item.title)} in ${escapeHtml(state.city)}</h2>
-                        <p class="page-copy">Minimal overlay-style cinema map with a left sidebar for movie, location, and date.</p>
+                        <p class="page-copy">Cinema map with a left sidebar for movie, location, and date.</p>
                     </div>
                     <div class="page-actions">
                         <a class="focus-close-btn" href="${buildMediaDetailUrl(item)}" aria-label="Exit theater map">✕</a>
@@ -1302,6 +1337,7 @@ function renderSettingsPage(root) {
                     <span class="setting-label">Email</span>
                     <input class="sidebar-input" id="account-email-input" type="email" value="${escapeHtml(state.settings.accountEmail || DEFAULT_SETTINGS.accountEmail)}">
                 </label>
+                <button class="secondary-btn settings-reset-inline" id="reset-password-btn" type="button">Reset password</button>
             `,
         },
         language: {
@@ -1315,7 +1351,6 @@ function renderSettingsPage(root) {
                         <option value="French">French</option>
                         <option value="Japanese">Japanese</option>
                     </select>
-                    <span class="setting-help">Preference for your experience.</span>
                 </label>
                 <label class="setting-card">
                     <span class="setting-label">Default country</span>
@@ -1342,13 +1377,7 @@ function renderSettingsPage(root) {
                         <option value="xlarge">Extra Large</option>
                     </select>
                 </label>
-                <label class="setting-card checkbox-card">
-                    <input type="checkbox" id="prefer-made-in-toggle" ${state.settings.preferMadeIn ? "checked" : ""}>
-                    <span>
-                        <span class="setting-label">Open with “Made In Country” first</span>
-                        <span class="setting-help">Useful for culture-first exploration</span>
-                    </span>
-                </label>
+                <button class="secondary-btn settings-reset-inline" id="reset-all-settings-btn" type="button">Reset all settings</button>
             `,
         },
     };
@@ -1360,7 +1389,7 @@ function renderSettingsPage(root) {
                     <div>
                         <p class="page-kicker">Settings</p>
                         <h2 class="page-title">Settings</h2>
-                        <p class="page-copy">Minimal overlay-style settings page with section navigation in the sidebar.</p>
+                        <p class="page-copy">Update your WorldView preferences from the section navigation on the left.</p>
                     </div>
                     <div class="page-actions">
                         <a class="focus-close-btn" href="${buildPageUrl("home", { country: state.country })}" aria-label="Exit settings">✕</a>
@@ -1379,15 +1408,13 @@ function renderSettingsPage(root) {
                     <div class="section-header">
                         <div>
                             <h3>${currentSection.title}</h3>
-                            <p class="inline-note">Changes are saved automatically.</p>
                         </div>
                     </div>
                     <div class="settings-grid settings-grid-page">
                         ${currentSection.body}
                     </div>
                     <div class="settings-actions">
-                        <p class="settings-status" id="settings-status">Stored locally in your browser.</p>
-                        <button class="secondary-btn" id="reset-settings-btn" type="button">Reset settings</button>
+                        <p class="settings-status" id="settings-status">Change settings and press Save settings.</p>
                         <button class="primary-btn" id="save-settings-btn" type="button">Save settings</button>
                     </div>
                 </section>
@@ -1434,15 +1461,15 @@ function renderPersonCard(person) {
                         <p class="person-role">${escapeHtml(person.role || "Creative")}</p>
                         <h3>${escapeHtml(person.name)}</h3>
                     </div>
-                    <span class="rating-badge">${renderRoleIcon(person.role)} Star</span>
+                    <span class="rating-badge">${renderRoleIcon(person.role)} Celeb</span>
                 </div>
-                <p>Explore this star and move directly into related titles.</p>
+                <p>Explore this celeb and move directly into related titles.</p>
                 <div class="known-for-row">
                     ${related.linked.slice(0, 3).map(item => `<a class="inline-link" href="${buildMediaDetailUrl(item)}">${escapeHtml(item.title)}</a>`).join("")}
                     ${related.unlinked.slice(0, 2).map(title => `<span class="known-for-pill">${escapeHtml(title)}</span>`).join("")}
                 </div>
                 <div class="section-actions">
-                    <a class="primary-btn" href="${buildPersonDetailUrl(person)}">Open star page</a>
+                    <a class="secondary-btn" href="${buildPersonDetailUrl(person)}">Open celeb page</a>
                 </div>
             </div>
         </article>
@@ -1511,7 +1538,6 @@ function renderSearchCollectionCard() {
 }
 
 function renderFilterSummaryCard(pills = []) {
-    const entry = getCountryEntry(state.country);
     return `
         <section class="summary-strip">
             <section class="section-card summary-card">
@@ -1520,11 +1546,6 @@ function renderFilterSummaryCard(pills = []) {
                     ${pills.map(value => `<span class="known-for-pill">${escapeHtml(value)}</span>`).join("")}
                 </div>
             </section>
-            <a class="section-card country-summary-card" href="${buildPageUrl("home", { country: state.country })}">
-                <p class="sidebar-label">Selected Country</p>
-                <h3>${countryFlag(state.country)} ${escapeHtml(entry.name)}</h3>
-                <p>Return to the world map</p>
-            </a>
         </section>
     `;
 }
@@ -1586,6 +1607,11 @@ function refreshShellTargets() {
     const settingsLink = document.getElementById("open-settings-btn");
     if (settingsLink) {
         settingsLink.href = buildPageUrl("settings", { country: state.country });
+    }
+
+    const brandLink = document.querySelector(".brand-link");
+    if (brandLink) {
+        brandLink.href = buildPageUrl("countrySearch", { country: state.country, countryq: state.countrySearchQuery });
     }
 
     const brandCopy = document.querySelector(".shell-brand-copy");
@@ -1661,14 +1687,12 @@ function populateSettingsInputs() {
     const fontSize = document.getElementById("font-size-select");
     const language = document.getElementById("language-select");
     const defaultCountry = document.getElementById("default-country-select");
-    const preferMadeIn = document.getElementById("prefer-made-in-toggle");
     if (accountName) accountName.value = state.settings.accountName || DEFAULT_SETTINGS.accountName;
     if (accountEmail) accountEmail.value = state.settings.accountEmail || DEFAULT_SETTINGS.accountEmail;
     if (theme) theme.value = state.settings.theme;
     if (fontSize) fontSize.value = state.settings.fontSize;
     if (language) language.value = state.settings.language || DEFAULT_SETTINGS.language;
     if (defaultCountry) defaultCountry.value = state.settings.defaultCountry;
-    if (preferMadeIn) preferMadeIn.checked = !!state.settings.preferMadeIn;
 }
 
 function readSettingsInputs() {
@@ -1678,7 +1702,6 @@ function readSettingsInputs() {
     const fontSize = document.getElementById("font-size-select");
     const language = document.getElementById("language-select");
     const defaultCountry = document.getElementById("default-country-select");
-    const preferMadeIn = document.getElementById("prefer-made-in-toggle");
     state.settings = {
         ...state.settings,
         accountName: accountName ? accountName.value.trim() || DEFAULT_SETTINGS.accountName : state.settings.accountName,
@@ -1687,7 +1710,6 @@ function readSettingsInputs() {
         fontSize: fontSize ? fontSize.value : state.settings.fontSize,
         language: language ? language.value : state.settings.language,
         defaultCountry: defaultCountry ? (sanitizeCountry(defaultCountry.value) || state.settings.defaultCountry || "NL") : state.settings.defaultCountry,
-        preferMadeIn: preferMadeIn ? preferMadeIn.checked : !!state.settings.preferMadeIn,
     };
     saveSettings();
     applySettings();
@@ -1696,23 +1718,40 @@ function readSettingsInputs() {
 
 function bindSettingsPageEvents() {
     const saveButton = document.getElementById("save-settings-btn");
-    const resetButton = document.getElementById("reset-settings-btn");
+    const resetAllButton = document.getElementById("reset-all-settings-btn");
+    const resetPasswordButton = document.getElementById("reset-password-btn");
     const status = document.getElementById("settings-status");
+    const inputs = document.querySelectorAll(".settings-main-panel input, .settings-main-panel select");
+
+    const promptToSave = (message = "Change settings and press Save settings.") => {
+        if (status) status.textContent = message;
+    };
+
+    inputs.forEach(input => {
+        input.addEventListener("input", () => promptToSave());
+        input.addEventListener("change", () => promptToSave());
+    });
 
     if (saveButton) {
         saveButton.addEventListener("click", () => {
             if (!readSettingsInputs()) return;
-            if (status) status.textContent = "Saved.";
+            promptToSave("Settings updated.");
         });
     }
 
-    if (resetButton) {
-        resetButton.addEventListener("click", () => {
+    if (resetAllButton) {
+        resetAllButton.addEventListener("click", () => {
             state.settings = { ...DEFAULT_SETTINGS };
             populateSettingsInputs();
             saveSettings();
             applySettings();
-            if (status) status.textContent = "Reset to recommended defaults.";
+            promptToSave("All settings reset.");
+        });
+    }
+
+    if (resetPasswordButton) {
+        resetPasswordButton.addEventListener("click", () => {
+            promptToSave("Password reset link sent.");
         });
     }
 }
@@ -1735,6 +1774,7 @@ function openSettingsModal() {
 function closeSettingsModal() {}
 
 function isPageActive(page) {
+    if (page === "countrySearch") return state.page === "countrySearch";
     if (page === "movies") return state.page === "movies" || state.page === "movie" || state.page === "theaters";
     if (page === "people") return state.page === "people" || state.page === "person";
     if (page === "search") return state.page === "search";
@@ -1747,11 +1787,11 @@ function defaultSearchScope() {
 }
 
 function buildNavTarget(page) {
+    if (page === "countrySearch") return buildPageUrl("countrySearch", { country: state.country, countryq: state.countrySearchQuery });
     if (page === "home") return buildPageUrl("home", { country: state.country });
     if (page === "search") return buildPageUrl("search", { country: state.country, scope: state.searchScope, q: state.search, role: state.roleFilter });
     if (page === "movies") return buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" });
     if (page === "people") return buildPageUrl("people", { country: state.country });
-    if (page === "countrySearch") return buildPageUrl("countrySearch", { country: state.country, countryq: state.countrySearchQuery });
     return buildPageUrl(page, { country: state.country });
 }
 
@@ -1796,13 +1836,13 @@ function updateUrlWithoutNavigation(url) {
 function updateDocumentTitle() {
     const entry = getCountryEntry(state.country);
     const pageName = {
-        home: "World Map",
+        home: "Country Selection",
         countrySearch: "Country Search",
         search: "Search",
         movies: "Movies",
-        people: "Stars",
-        movie: "Title Detail",
-        person: "Person Detail",
+        people: "Celebs",
+        movie: "WorldView",
+        person: "Celeb Detail",
         theaters: "Theater Map",
         settings: "Settings",
     }[state.page] || "WorldView";

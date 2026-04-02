@@ -104,6 +104,7 @@ function buildMap() {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
+    svg.selectAll("*").remove();
     svg.attr("viewBox", `0 0 ${width} ${height}`);
 
     // Natural Earth projection — handles antimeridian correctly
@@ -113,27 +114,29 @@ function buildMap() {
 
     const pathGen = d3.geoPath().projection(projection);
 
+    const zoomLayer = svg.append("g").attr("class", "map-zoom-layer");
+
     // Subtle graticule (grid lines)
     const graticule = d3.geoGraticule().step([20, 20]);
-    svg.append("path")
+    zoomLayer.append("path")
         .datum(graticule())
         .attr("d", pathGen)
         .attr("fill", "none")
-        .attr("stroke", "#1a2530")
+        .attr("stroke", "#d6dee7")
         .attr("stroke-width", 0.3);
 
     // Globe outline
-    svg.append("path")
+    zoomLayer.append("path")
         .datum({ type: "Sphere" })
         .attr("d", pathGen)
         .attr("fill", "none")
-        .attr("stroke", "#1e2d3d")
+        .attr("stroke", "#c6d2de")
         .attr("stroke-width", 0.5);
 
     // Draw countries from inlined TopoJSON (WORLD_TOPO from world-data.js)
     const countries = topojson.feature(WORLD_TOPO, WORLD_TOPO.objects.countries).features;
 
-    svg.selectAll("path.country")
+    zoomLayer.selectAll("path.country")
         .data(countries)
         .enter()
         .append("path")
@@ -144,4 +147,14 @@ function buildMap() {
             const code = NUM_TO_ALPHA[String(d.id)];
             return code ? (MAP_NAMES[code] || code) : "";
         });
+
+    const zoomBehavior = d3.zoom()
+        .scaleExtent([1, 5])
+        .translateExtent([[-width, -height], [width * 2, height * 2]])
+        .on("zoom", event => {
+            zoomLayer.attr("transform", event.transform);
+        });
+
+    svg.call(zoomBehavior);
+    svg.node().__mapZoomBehavior = zoomBehavior;
 }

@@ -204,6 +204,17 @@ function bindCommonEvents() {
             window.location.href = buildPageUrl("search", { country: state.country, q: query, scope });
         });
     }
+
+    window.addEventListener("resize", () => {
+        if (state.page !== "home") return;
+        const root = document.getElementById("page-root");
+        if (!root) return;
+        syncHomeMapViewport(root);
+        buildMap();
+        bindMapInteractions();
+        highlightMapCountry(state.country);
+        bindHomeMapTools();
+    });
 }
 
 function renderSidebar(searchQuery = "") {
@@ -644,7 +655,17 @@ async function hydrateLivePeople() {
     }));
 }
 
+function syncHomeMapViewport(root = document.getElementById("page-root")) {
+    if (state.page !== "home" || !root) return;
+    const topbarHeight = document.querySelector(".topbar")?.getBoundingClientRect().height || 0;
+    const viewportHeight = Math.max(520, Math.round(window.innerHeight - topbarHeight - 12));
+    root.style.height = `${viewportHeight}px`;
+    root.style.minHeight = `${viewportHeight}px`;
+    root.style.maxHeight = `${viewportHeight}px`;
+}
+
 function renderHomePage(root) {
+    syncHomeMapViewport(root);
     root.innerHTML = `
         <div class="hero-card map-selection-panel" id="home-hero"></div>
         <div class="map-controls" aria-label="Map controls">

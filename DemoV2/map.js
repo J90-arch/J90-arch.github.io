@@ -148,13 +148,53 @@ function buildMap() {
             return code ? (MAP_NAMES[code] || code) : "";
         });
 
+    const mapBounds = pathGen.bounds({ type: "Sphere" });
+    const viewportExtent = [[0, 0], [width, height]];
+
+    function clampTransform(transform) {
+        const [[viewLeft, viewTop], [viewRight, viewBottom]] = viewportExtent;
+        const viewportWidth = viewRight - viewLeft;
+        const viewportHeight = viewBottom - viewTop;
+
+        const scaledLeft = transform.applyX(mapBounds[0][0]);
+        const scaledRight = transform.applyX(mapBounds[1][0]);
+        const scaledTop = transform.applyY(mapBounds[0][1]);
+        const scaledBottom = transform.applyY(mapBounds[1][1]);
+
+        let dx = 0;
+        let dy = 0;
+
+        if (scaledRight - scaledLeft <= viewportWidth) {
+            dx = viewLeft + viewportWidth / 2 - ((scaledLeft + scaledRight) / 2);
+        } else if (scaledLeft > viewLeft) {
+            dx = viewLeft - scaledLeft;
+        } else if (scaledRight < viewRight) {
+            dx = viewRight - scaledRight;
+        }
+
+        if (scaledBottom - scaledTop <= viewportHeight) {
+            dy = viewTop + viewportHeight / 2 - ((scaledTop + scaledBottom) / 2);
+        } else if (scaledTop > viewTop) {
+            dy = viewTop - scaledTop;
+        } else if (scaledBottom < viewBottom) {
+            dy = viewBottom - scaledBottom;
+        }
+
+        return (dx || dy)
+            ? transform.translate(dx / transform.k, dy / transform.k)
+            : transform;
+    }
+
     const zoomBehavior = d3.zoom()
+        .extent(viewportExtent)
         .scaleExtent([1, 5])
-        .translateExtent([[-width, -height], [width * 2, height * 2]])
+        .translateExtent(mapBounds)
+        .constrain(transform => clampTransform(transform))
         .on("zoom", event => {
-            zoomLayer.attr("transform", event.transform);
+            zoomLayer.attr("transform", clampTransform(event.transform));
         });
 
     svg.call(zoomBehavior);
     svg.node().__mapZoomBehavior = zoomBehavior;
+    svg.node().__mapClampTransform = clampTransform;
 }

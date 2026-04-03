@@ -523,10 +523,7 @@ function renderMovieSidebar(header, container) {
     `;
 
     container.innerHTML = `
-        <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Back to Movies", buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" }))}
-            ${item ? renderSidebarLink("Open Theater Map", buildPageUrl("theaters", { country: state.country, id: item.id, type: item.type, collection: item.collection })) : ""}
-        </section>
+        ${item ? `<section class="sidebar-group sidebar-links">${renderSidebarLink("Open Theater Map", buildPageUrl("theaters", { country: state.country, id: item.id, type: item.type, collection: item.collection }))}</section>` : ""}
         <section class="sidebar-group">
             <h3 class="sidebar-title">Related Titles</h3>
             <div class="sidebar-poster-grid">
@@ -548,9 +545,6 @@ function renderPersonSidebar(header, container) {
     `;
 
     container.innerHTML = `
-        <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Back to Celebs", buildPageUrl("people", { country: state.country }))}
-        </section>
         <section class="sidebar-group">
             <h3 class="sidebar-title">Known For</h3>
             <div class="sidebar-poster-grid">
@@ -587,9 +581,18 @@ function renderTheaterSidebar(header, container) {
 function bindSidebarInteractions() {
     if (state.page === "home") {
         const searchInput = document.getElementById("country-search");
-        if (searchInput) {
+        if (searchInput && !searchInput.dataset.bound) {
+            searchInput.dataset.bound = "1";
             searchInput.addEventListener("input", () => {
-                renderSidebar(searchInput.value.trim());
+                const nextValue = searchInput.value;
+                const caret = searchInput.selectionStart ?? nextValue.length;
+                renderSidebar(nextValue.trim());
+                bindSidebarInteractions();
+                const nextInput = document.getElementById("country-search");
+                if (nextInput) {
+                    nextInput.focus({ preventScroll: true });
+                    nextInput.setSelectionRange(caret, caret);
+                }
             });
         }
         bindHomeCountryButtons();
@@ -652,6 +655,7 @@ function bindHomeCountryButtons() {
             persistSelectedCountry();
             updateUrlWithoutNavigation(buildPageUrl("home", { country: state.country }));
             renderSidebar(document.getElementById("country-search").value.trim());
+            bindSidebarInteractions();
             updateHomeHero();
             bindHomeMapTools();
             refreshShellTargets();
@@ -1007,7 +1011,6 @@ function updateHomeHero() {
         <div class="hero-actions">
             <a class="secondary-btn" href="${buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" })}">Browse movies</a>
             <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Browse celebs</a>
-            <a class="secondary-btn" href="${buildPageUrl("settings", { country: state.country })}">Settings</a>
         </div>
     `;
 }
@@ -1112,6 +1115,7 @@ function bindMapInteractions() {
         updateUrlWithoutNavigation(buildPageUrl("home", { country: state.country }));
         const countrySearch = document.getElementById("country-search");
         renderSidebar(countrySearch ? countrySearch.value.trim() : "");
+        bindSidebarInteractions();
         updateHomeHero();
         bindHomeMapTools();
         refreshShellTargets();

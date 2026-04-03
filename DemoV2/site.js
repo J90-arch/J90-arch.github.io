@@ -900,8 +900,7 @@ function renderCountrySearchPage(root) {
                         <a class="primary-btn country-search-map-btn" href="${buildPageUrl("home", { country: state.country })}">Open Map</a>
                         <a class="secondary-btn" href="${buildPageUrl("movies", { country: state.country, collection: state.collection, type: "movies" })}">Popular Movies</a>
                         <a class="secondary-btn" href="${buildPageUrl("people", { country: state.country })}">Popular Celebs</a>
-                        <a class="secondary-btn" href="${buildPageUrl("settings", { country: state.country })}">Settings</a>
-                    </div>
+                                </div>
                 </aside>
             </section>
         </section>

@@ -190,11 +190,23 @@ function getShellTitle() {
     return "WorldView";
 }
 
+function usesSearchFirstCountrySelection() {
+    return PAGE_FILES.home === "map.html" && PAGE_FILES.countrySearch === "index.html";
+}
+
+function getCountrySelectionNavPage() {
+    return usesSearchFirstCountrySelection() ? "countrySearch" : "home";
+}
+
+function isCountrySelectionPage(page = state.page) {
+    return page === "home" || page === "countrySearch";
+}
+
 function getShellSubtitle() {
     const entry = getCountryEntry(state.country);
     return {
         home: `${entry.name} selected`,
-        countrySearch: `Browse by continent or search directly`,
+        countrySearch: `Search countries first or browse by continent`,
         search: `Search results in ${entry.name}`,
         movies: `${entry.name} exploration`,
         people: `${entry.name} exploration`,
@@ -227,7 +239,7 @@ function renderShell() {
         <div class="app-shell${isHomePage ? " home-shell" : ""}">
             <header class="topbar">
                 <div class="topbar-shell">
-                    <a class="brand shell-brand brand-link" href="${buildPageUrl("countrySearch", { country: state.country, countryq: state.countrySearchQuery })}" aria-label="Open WorldView country search">
+                    <a class="brand shell-brand brand-link" href="${buildNavTarget(getCountrySelectionNavPage())}" aria-label="Open WorldView country selection">
                         <div class="brand-mark">✦</div>
                         <div class="shell-brand-copy">
                             <h1>${escapeHtml(getShellTitle())}</h1>
@@ -244,8 +256,7 @@ function renderShell() {
                             <button class="primary-btn" type="submit">Search</button>
                         </form>
                         <nav class="topnav" aria-label="Primary">
-                            ${renderNavLink("countrySearch", "Country Search")}
-                            ${renderNavLink("home", "Country Selection")}
+                            ${renderNavLink(getCountrySelectionNavPage(), "Country Selection")}
                             ${renderNavLink("movies", "Popular Movies")}
                             ${renderNavLink("people", "Popular Celebs")}
                         </nav>
@@ -327,7 +338,7 @@ function renderHomeSidebar(header, container, searchQuery = "") {
     header.innerHTML = `
         <div>
             <h2>Country Selection</h2>
-            <p>Choose a country from the map or open the focused country-search flow.</p>
+            <p>Choose a country from the map or open the search-first country selection view.</p>
         </div>
     `;
 
@@ -337,14 +348,14 @@ function renderHomeSidebar(header, container, searchQuery = "") {
 
     const searchBlock = `
         <div class="sidebar-group">
-            <label class="sidebar-label" for="country-search">Country Search</label>
+            <label class="sidebar-label" for="country-search">Search Countries</label>
             <input class="sidebar-input" type="text" id="country-search" placeholder="Search countries..." value="${escapeHtml(searchQuery)}" autocomplete="off" spellcheck="false">
         </div>
     `;
 
     const alternateSearchLink = `
         <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Open Country Search", buildPageUrl("countrySearch", { country: state.country, countryq: searchQuery }))}
+            ${renderSidebarLink("Search Countries", buildPageUrl("countrySearch", { country: state.country, countryq: searchQuery }))}
         </section>
     `;
 
@@ -387,14 +398,14 @@ function renderHomeSidebar(header, container, searchQuery = "") {
 function renderCountrySearchSidebar(header, container) {
     header.innerHTML = `
         <div>
-            <h2>Country Search</h2>
-            <p>Focused country search with expandable continents and quick access to the map.</p>
+            <h2>Country Selection</h2>
+            <p>Search-first country selection with expandable continents and quick access to the map.</p>
         </div>
     `;
 
     container.innerHTML = `
         <section class="sidebar-group sidebar-links">
-            ${renderSidebarLink("Open Country Selection", buildPageUrl("home", { country: state.country }))}
+            ${renderSidebarLink("Open Map", buildPageUrl("home", { country: state.country }))}
         </section>
     `;
 }
@@ -854,9 +865,9 @@ function renderCountrySearchPage(root) {
         <section class="country-search-page">
             <section class="page-header country-search-hero">
                 <div class="country-search-hero-copy">
-                    <p class="page-kicker">Country Search</p>
-                    <h2 class="page-title">Search countries first</h2>
-                    <p class="page-copy">Use the search bar for speed, or open a continent to browse the countries inside it.</p>
+                    <p class="page-kicker">Country Selection</p>
+                    <h2 class="page-title">Country Selection</h2>
+                    <p class="page-copy">Search countries first, or open a continent to browse the countries inside it.</p>
                 </div>
                 <label class="country-search-big" for="country-alt-search">
                     <span class="sidebar-label">Search Countries</span>
@@ -1756,7 +1767,7 @@ function refreshShellTargets() {
 
     const brandLink = document.querySelector(".brand-link");
     if (brandLink) {
-        brandLink.href = buildPageUrl("countrySearch", { country: state.country, countryq: state.countrySearchQuery });
+        brandLink.href = buildNavTarget(getCountrySelectionNavPage());
     }
 
     const brandCopy = document.querySelector(".shell-brand-copy");
@@ -1919,7 +1930,8 @@ function openSettingsModal() {
 function closeSettingsModal() {}
 
 function isPageActive(page) {
-    if (page === "countrySearch") return state.page === "countrySearch";
+    if (page === getCountrySelectionNavPage()) return isCountrySelectionPage();
+    if (page === "countrySearch" || page === "home") return false;
     if (page === "movies") return state.page === "movies" || state.page === "movie" || state.page === "theaters";
     if (page === "people") return state.page === "people" || state.page === "person";
     if (page === "search") return state.page === "search";
@@ -1982,7 +1994,7 @@ function updateDocumentTitle() {
     const entry = getCountryEntry(state.country);
     const pageName = {
         home: "Country Selection",
-        countrySearch: "Country Search",
+        countrySearch: "Country Selection",
         search: "Search",
         movies: "Movies",
         people: "Celebs",

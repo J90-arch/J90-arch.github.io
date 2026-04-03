@@ -513,7 +513,7 @@ function renderPeopleSidebar(header, container) {
             <form class="sidebar-form" action="people.html">
                 <input type="hidden" name="country" value="${escapeHtml(state.country)}">
                 <input type="hidden" name="role" value="${escapeHtml(state.roleFilter)}">
-                <input type="text" name="q" placeholder="Search actors or directors..." value="${escapeHtml(state.search)}">
+                <input class="sidebar-input" type="text" name="q" placeholder="Search actors or directors..." value="${escapeHtml(state.search)}">
                 <button class="primary-btn" type="submit">Search</button>
             </form>
         </section>

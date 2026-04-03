@@ -205,6 +205,7 @@ function getShellSubtitle() {
 
 function renderShell() {
     const app = document.getElementById("app");
+    const isHomePage = state.page === "home";
 
     if (isFocusPage()) {
         app.innerHTML = `
@@ -216,14 +217,14 @@ function renderShell() {
     }
 
     const sidebarMarkup = showMainSidebar() ? `
-        <aside class="sidebar">
+        <aside class="sidebar${isHomePage ? " home-sidebar" : ""}">
             <div class="sidebar-header" id="sidebar-header"></div>
-            <div class="sidebar-body" id="sidebar-body"></div>
+            <div class="sidebar-body${isHomePage ? " home-sidebar-body" : ""}" id="sidebar-body"></div>
         </aside>
     ` : "";
 
     app.innerHTML = `
-        <div class="app-shell">
+        <div class="app-shell${isHomePage ? " home-shell" : ""}">
             <header class="topbar">
                 <div class="topbar-shell">
                     <a class="brand shell-brand brand-link" href="${buildPageUrl("countrySearch", { country: state.country, countryq: state.countrySearchQuery })}" aria-label="Open WorldView country search">
@@ -253,9 +254,9 @@ function renderShell() {
                 </div>
             </header>
 
-            <main class="workspace${showMainSidebar() ? "" : " workspace-wide"}">
+            <main class="workspace${showMainSidebar() ? "" : " workspace-wide"}${isHomePage ? " home-workspace" : ""}">
                 ${sidebarMarkup}
-                <section id="page-root" class="${state.page === "home" ? "map-page map-area" : "page-main"}"></section>
+                <section id="page-root" class="${state.page === "home" ? "map-page map-area home-map-area" : "page-main"}"></section>
             </main>
         </div>
     `;
@@ -370,14 +371,14 @@ function renderHomeSidebar(header, container, searchQuery = "") {
         ${alternateSearchLink}
         <section class="sidebar-group">
             <h3 class="sidebar-title">Favourites</h3>
-            <div class="country-list">
-                ${favorites.length ? favorites.map(code => renderCountryCard(code)).join("") : '<div class="empty-card">No countries here yet.</div>'}
+            <div class="country-list compact-country-list">
+                ${favorites.length ? favorites.map(code => renderCountryCard(code, { compact: true })).join("") : '<div class="empty-card">No countries here yet.</div>'}
             </div>
         </section>
         <section class="sidebar-group">
             <h3 class="sidebar-title">Featured Countries</h3>
-            <div class="country-list">
-                ${featured.map(code => renderCountryCard(code)).join("")}
+            <div class="country-list compact-country-list">
+                ${featured.map(code => renderCountryCard(code, { compact: true })).join("")}
             </div>
         </section>
     `;
@@ -608,30 +609,39 @@ function renderSidebarLink(label, href) {
     return `<a class="sidebar-inline-link" href="${href}">${label}</a>`;
 }
 
-function renderCountryCard(code) {
+function renderCountryCard(code, options = {}) {
+    const { compact = false } = options;
     const entry = getCountryEntry(code);
     const popularCount = (entry.popular.movies?.length || 0) + (entry.popular.tvshows?.length || 0);
     const madeInCount = (entry.madeIn.movies?.length || 0) + (entry.madeIn.tvshows?.length || 0);
     const peopleCount = listPeople(code).length;
     const active = state.country === code ? " active" : "";
 
-    const inner = `
-        <div class="country-flag">${countryFlag(code)}</div>
-        <div>
-            <h4>${escapeHtml(entry.name)}</h4>
-            <p>${escapeHtml(entry.blurb)}</p>
-            <div class="country-meta">
-                <span class="meta-pill">${popularCount} popular</span>
-                <span class="meta-pill">${madeInCount} local</span>
-                <span class="meta-pill">${peopleCount} celebs</span>
+    const inner = compact
+        ? `
+            <div class="country-flag compact-country-flag">${countryFlag(code)}</div>
+            <div class="compact-country-copy">
+                <strong class="compact-country-name">${escapeHtml(entry.name)}</strong>
             </div>
-        </div>
-    `;
+        `
+        : `
+            <div class="country-flag">${countryFlag(code)}</div>
+            <div>
+                <h4>${escapeHtml(entry.name)}</h4>
+                <p>${escapeHtml(entry.blurb)}</p>
+                <div class="country-meta">
+                    <span class="meta-pill">${popularCount} popular</span>
+                    <span class="meta-pill">${madeInCount} local</span>
+                    <span class="meta-pill">${peopleCount} celebs</span>
+                </div>
+            </div>
+        `;
 
+    const className = `country-item${compact ? " country-item-compact" : ""}${active}`;
     if (state.page === "home") {
-        return `<button type="button" class="country-item${active}" data-country-select="${code}">${inner}</button>`;
+        return `<button type="button" class="${className}" data-country-select="${code}">${inner}</button>`;
     }
-    return `<a class="country-item${active}" href="${buildSidebarTarget(code)}">${inner}</a>`;
+    return `<a class="${className}" href="${buildSidebarTarget(code)}">${inner}</a>`;
 }
 
 function bindHomeCountryButtons() {
@@ -981,7 +991,12 @@ function updateHomeHero() {
     const peopleCount = listPeople(state.country).length;
 
     hero.innerHTML = `
-        <div class="map-panel-handle" id="home-hero-handle" aria-label="Drag selected country panel" title="Drag panel">⋮⋮</div>
+        <div class="map-panel-handle" id="home-hero-handle" aria-label="Drag selected country panel" title="Drag panel">
+            <span class="map-panel-grip" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+            </span>
+        </div>
         <p class="page-kicker">Selected Country</p>
         <h2>${countryFlag(state.country)} ${escapeHtml(entry.name)}</h2>
         <p class="hero-text">${escapeHtml(entry.blurb)}</p>
@@ -1033,6 +1048,7 @@ function bindHomeMapTools() {
 
     handle.addEventListener("pointerdown", (event) => {
         event.preventDefault();
+        handle.classList.add("dragging");
         const stageRect = stage.getBoundingClientRect();
         const panelRect = panel.getBoundingClientRect();
         const offsetX = event.clientX - panelRect.left;
@@ -1052,6 +1068,7 @@ function bindHomeMapTools() {
         };
 
         const stop = () => {
+            handle.classList.remove("dragging");
             window.removeEventListener("pointermove", onMove);
             window.removeEventListener("pointerup", stop);
         };

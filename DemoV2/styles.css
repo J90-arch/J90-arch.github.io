@@ -976,6 +976,11 @@ a { color: inherit; }
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
 }
 
+.poster-placeholder[data-live-poster="1"] .poster-icon,
+.poster-placeholder[data-live-poster="1"] .poster-title {
+    display: none;
+}
+
 .content-card-top {
     display: flex;
     justify-content: space-between;

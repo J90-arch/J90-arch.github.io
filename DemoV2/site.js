@@ -21,6 +21,72 @@ const PAGE_FILES = {
     settings: "settings.html",
 };
 
+const DEFAULT_CITY_BY_COUNTRY = {
+    NL: "Amsterdam",
+    JP: "Tokyo",
+    FR: "Paris",
+    ES: "Madrid",
+    DE: "Berlin",
+    BR: "São Paulo",
+    IN: "Mumbai",
+    AU: "Sydney",
+    IT: "Rome",
+    MX: "Mexico City",
+    CA: "Toronto",
+    US: "New York",
+    GB: "London",
+    KR: "Seoul",
+    LT: "Vilnius",
+    LV: "Riga",
+    EE: "Tallinn",
+    BE: "Brussels",
+    PT: "Lisbon",
+    SE: "Stockholm",
+    NO: "Oslo",
+    DK: "Copenhagen",
+    FI: "Helsinki",
+    PL: "Warsaw",
+    CZ: "Prague",
+    AT: "Vienna",
+    CH: "Zurich",
+    IE: "Dublin",
+    TR: "Istanbul",
+    GR: "Athens",
+    ZA: "Cape Town",
+    AR: "Buenos Aires",
+    CL: "Santiago",
+    CO: "Bogotá",
+    NZ: "Auckland",
+    SG: "Singapore",
+    MY: "Kuala Lumpur",
+    TH: "Bangkok",
+    ID: "Jakarta",
+    PH: "Manila",
+    VN: "Ho Chi Minh City",
+    HK: "Hong Kong",
+    TW: "Taipei",
+    CN: "Beijing",
+    AE: "Dubai",
+    SA: "Riyadh",
+    EG: "Cairo",
+    IL: "Tel Aviv",
+    HU: "Budapest",
+    RO: "Bucharest",
+    BG: "Sofia",
+    HR: "Zagreb",
+    SI: "Ljubljana",
+    SK: "Bratislava",
+    RS: "Belgrade",
+    UA: "Kyiv",
+    IS: "Reykjavík",
+    LU: "Luxembourg",
+};
+
+function defaultCityForCountry(code) {
+    const normalized = String(code || "").toUpperCase();
+    return DEFAULT_CITY_BY_COUNTRY[normalized] || COUNTRY_CATALOG[normalized]?.name || MAP_NAMES[normalized] || "City Center";
+}
+
 const state = {
     page: document.body.dataset.page || "home",
     favorites: [],
@@ -33,7 +99,7 @@ const state = {
     search: "",
     countrySearchQuery: "",
     id: "",
-    city: "Amsterdam",
+    city: defaultCityForCountry("NL"),
     date: "2026-04-04",
     settingsSection: "language",
 };
@@ -69,7 +135,8 @@ function syncStateFromUrl() {
     state.search = (params.get("q") || "").trim();
     state.countrySearchQuery = (params.get("countryq") || "").trim();
     state.id = (params.get("id") || "").trim();
-    state.city = (params.get("city") || "Amsterdam").trim() || "Amsterdam";
+    const defaultCity = defaultCityForCountry(state.country);
+    state.city = (params.get("city") || defaultCity).trim() || defaultCity;
     state.date = (params.get("date") || "2026-04-04").trim() || "2026-04-04";
     state.settingsSection = ["account", "language", "visual"].includes(params.get("section")) ? params.get("section") : "language";
 }
@@ -638,6 +705,7 @@ async function hydrateLivePosters() {
         const visual = await tmdbFindMediaVisual(node.dataset.mediaTitle, node.dataset.mediaType);
         if (visual?.poster) {
             node.style.backgroundImage = `url("${visual.poster}")`;
+            node.dataset.livePoster = "1";
         }
     }));
 }
@@ -1089,7 +1157,7 @@ function renderSearchPage(root) {
     const entry = getCountryEntry(state.country);
     const titleResults = searchAllMedia(state.country, state.search);
     const peopleResults = searchPeople(state.country, state.search, state.roleFilter);
-    const resultHeading = `Results for ${state.collection === "madeIn" ? "made-in shows" : "popular shows"} in the ${entry.name}`;
+    const resultHeading = `Results for ${state.collection === "madeIn" ? "made-in titles" : "popular titles"} in ${entry.name}`;
 
     const titleSection = `
         <section class="section-card">
@@ -1209,7 +1277,7 @@ function renderMovieDetailPage(root) {
             <div class="page-header-top">
                 <div>
                     <p class="page-kicker">Title Detail</p>
-                    <h2 class="page-title">${escapeHtml(item.title)}</h2>
+                    <h2 class="page-title">Movie Description</h2>
                     <p class="page-copy">Separate item page with contextual links to celebs and theater information.</p>
                 </div>
                 <div class="page-actions">
@@ -1266,7 +1334,7 @@ function renderPersonDetailPage(root) {
             <div class="page-header-top">
                 <div>
                     <p class="page-kicker">Person Detail</p>
-                    <h2 class="page-title">${escapeHtml(person.name)}</h2>
+                    <h2 class="page-title">Celeb Description</h2>
                     <p class="page-copy">Separate person page with contextual links back into title detail pages.</p>
                 </div>
                 <div class="page-actions">
@@ -1947,7 +2015,7 @@ function renderPosterVisual(item, large = false) {
     return `
         <div class="poster-placeholder${large ? " poster-large" : ""}" data-media-title="${escapeHtml(item.title)}" data-media-type="${escapeHtml(item.type || "movies")}">
             <div class="poster-icon">${renderMediaGlyph(item)}</div>
-            <div class="poster-title">${escapeHtml(shortPosterLabel(item.title))}</div>
+            ${large ? `<div class="poster-title">${escapeHtml(shortPosterLabel(item.title))}</div>` : ""}
         </div>
     `;
 }

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090f1e">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23090f1e'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-size='46' font-family='sans-serif' font-weight='bold' fill='%2350dce6'%3EM%3C/text%3E%3C/svg%3E">
+  <title>MARSALA | Live MAC Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="header">
+      <div><p class="eyebrow">CESE4055 · PROJECT 2</p><h1>MARSALA<span class="dot">.</span></h1><p class="subtitle">Satellite random access, decoded live.</p></div>
+      <div class="header-right"><span class="live"><i></i> LIVE SIMULATION</span><span class="version">100 SLOTS / 256 SAMPLES</span></div>
+    </header>
+    <section class="hero">
+      <div class="panel frame-panel">
+        <div class="panel-head"><div><p class="kicker">FRAME VIEW</p><h2>Collision map</h2></div><span id="frame-state" class="chip">READY</span></div>
+        <div id="grid" class="grid" role="img" aria-label="100 slot frame"></div>
+        <div class="legend"><span><i class="empty"></i>Empty</span><span><i class="single"></i>Singleton</span><span><i class="collision"></i>Collision</span><span><i class="sic"></i>SIC decoded</span><span><i class="marsala"></i>MARSALA decoded</span></div>
+        <div class="timeline"><div class="timeline-top"><span id="event-label">Preparing simulation…</span><span id="event-count">0 / 0</span></div><div class="track"><div id="progress" class="fill"></div></div></div>
+      </div>
+      <aside class="side">
+        <div class="panel score-panel"><p class="kicker">RECEIVER COMPARISON</p><h2>Packets delivered</h2><div id="scorebars" class="scorebars"></div></div>
+        <div class="metrics"><div class="metric"><span>ACTIVE USERS</span><strong id="users">—</strong></div><div class="metric"><span>MARSALA EXTRA</span><strong id="extra">—</strong></div><div class="metric"><span>CORRELATIONS</span><strong id="correlations">—</strong></div></div>
+        <div class="panel note"><p class="kicker">WHAT YOU'RE SEEING</p><p>Orange slots collide. Cyan singletons start SIC. Gold shows packets recovered by replica combining, which lets SIC resume.</p></div>
+      </aside>
+    </section>
+    <section class="panel controls"><div class="controls-head"><div><p class="kicker">LIVE CONTROLS</p><h2>Shape the channel</h2></div><div class="buttons"><button id="new-frame" type="button">New frame</button><button id="replay" type="button" class="secondary">Replay</button></div></div><div id="sliders" class="sliders"></div></section>
+    <footer><span>Oracle-assisted concept simulation. Packet identity and amplitude are known to the decoder; results are illustrative.</span><span>CRDSA + MARSALA · <a href="https://github.com/J90-arch/J90-arch.github.io/tree/main/project2">SOURCE</a></span></footer>
+  </main>
+  <a class="report-button" href="Project2_report.pdf" target="_blank" rel="noopener">Report <span aria-hidden="true">↗</span></a>
+  <script src="app.js" defer></script>
+</body>
+</html>

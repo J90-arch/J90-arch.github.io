@@ -1,16 +1,40 @@
-\documentclass[conference]{IEEEtran}
+\documentclass[a4paper,10pt]{article}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage{helvet}
+\usepackage{microtype}
+\usepackage{sectsty}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{graphicx}
-\usepackage{balance}
-\usepackage[hidelinks]{hyperref}
-
-\title{From Collisions to Recoveries: A Comparative Study of MARSALA Random Access}
-\author{\IEEEauthorblockN{CESE4055 Group Project 2}
-\IEEEauthorblockA{Ad Hoc and Sensor Networks}}
+\definecolor{tudelftdarkblue}{RGB}{12,35,64}
+\definecolor{tudelftblue}{RGB}{0,118,194}
+\usepackage[colorlinks=true,allcolors=tudelftblue]{hyperref}
+\renewcommand{\familydefault}{\sfdefault}
+\allsectionsfont{\color{black}}
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.7cm}
 
 \begin{document}
-\maketitle
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+{\Huge\bfseries A Simulation and Analysis of MARSALA Random Access\par}
+\vspace{1.5cm}
+{\LARGE Ad-Hoc and Sensor Networks\par}
+\vspace{0.5cm}
+{\large CESE4055\par}
+\vspace{2cm}
+{\Large\bfseries\color{tudelftdarkblue}Group 3\par}
+\vspace{0.5cm}
+{\Large\color{tudelftdarkblue}\today\par}
+\vfill
+\includegraphics[width=0.6\textwidth]{report_assets/TU_delft_logo.jpg}
+\end{titlepage}
 
 \begin{abstract}
 Satellite random access must recover packets when several users transmit in
@@ -26,10 +50,10 @@ model, so these values illustrate mechanisms rather than predict physical-link
 performance.
 \end{abstract}
 
-\begin{IEEEkeywords}
-random access, slotted ALOHA, CRDSA, MARSALA, successive interference
-cancellation, satellite communications
-\end{IEEEkeywords}
+\noindent\textbf{Keywords:} random access, slotted ALOHA, CRDSA, MARSALA,
+successive interference cancellation, satellite communications
+
+\begin{multicols}{2}
 
 \section{Introduction}
 In a satellite return link, many terminals share a finite set of time slots.
@@ -107,8 +131,8 @@ additional packets follow replica combination and renewed SIC. This example
 is useful for explaining the algorithm; averaged results below describe the
 parameter effects.
 
-\begin{table}[t]
-\caption{Throughput at Equal Packet Load $U=0.75$}
+\begin{center}
+\captionof{table}{Throughput at Equal Packet Load $U=0.75$}
 \label{tab:replicas}
 \centering
 \begin{tabular}{cccc}
@@ -121,7 +145,7 @@ $R$ & Slotted ALOHA & CRDSA & MARSALA \\
 4 & 0.356 & 0.428 & 0.750 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{center}
 
 \section{Parameter Effects}
 \subsection{Number of Replicas}
@@ -150,13 +174,13 @@ for a less capable code or a stronger reliability requirement. It excludes
 borderline combined packets; the model does not quantify any coding gain or
 error-rate benefit from that stricter requirement.
 
-\begin{figure}[t]
+\begin{center}
 \centering
-\includegraphics[width=\columnwidth]{results/parameter_effects.png}
-\caption{Effect of SNR, decoding threshold, and replica count at equal
+\includegraphics[width=\linewidth]{results/parameter_effects.png}
+\captionof{figure}{Effect of SNR, decoding threshold, and replica count at equal
 arrival load $U=0.75$. Each point averages 60 frames.}
 \label{fig:parameters}
-\end{figure}
+\end{center}
 
 \subsection{Offered Load}
 As $U$ grows, singleton slots become rarer and ALOHA loss rises. SIC keeps
@@ -166,13 +190,13 @@ more candidate slots. Fig.~\ref{fig:throughput} plots delivered packets
 against replica load $G$; curves for different $R$ should not be compared
 as equal-demand experiments at the same horizontal coordinate.
 
-\begin{figure}[t]
+\begin{center}
 \centering
-\includegraphics[width=\columnwidth]{results/throughput_vs_load.png}
-\caption{Throughput versus replica load for the three receiver families.
+\includegraphics[width=\linewidth]{results/throughput_vs_load.png}
+\captionof{figure}{Throughput versus replica load for the three receiver families.
 The same $G$ corresponds to different user counts when $R$ differs.}
 \label{fig:throughput}
-\end{figure}
+\end{center}
 
 \section{Delay, Loss, and Complexity}
 Undelivered packets in the delay experiment retry in new slots the next
@@ -190,15 +214,14 @@ correlations, replica localisation, phase alignment, and combining. At
 $G=2.5$ with $R=2$, this implementation averages about 11,353
 correlations per frame.
 
-\begin{figure}[t]
+\begin{center}
 \centering
-\includegraphics[width=\columnwidth]{results/delay_vs_load.png}
-\caption{Mean delivered-packet delay under immediate next-frame
+\includegraphics[width=\linewidth]{results/delay_vs_load.png}
+\captionof{figure}{Mean delivered-packet delay under immediate next-frame
 retransmission. Dropped packets are excluded from the mean.}
 \label{fig:delay}
-\end{figure}
+\end{center}
 
-\balance
 \section{Scope and Limitations}
 This is an \emph{oracle-assisted concept simulation}. The decoder reads
 true slot occupancy, packet symbols, and amplitudes from the frame
@@ -218,6 +241,9 @@ combining helps, while replica count balances diversity against added
 contention. The gain costs receiver correlations and depends on channel
 knowledge that this concept model idealises. These tradeoffs, rather than
 a single peak-throughput number, are the main lesson of the comparison.
+
+\end{multicols}
+\newpage
 
 \begin{thebibliography}{2}
 \bibitem{casini2007} E. Casini, R. De Gaudenzi, and O. del Rio Herrero,

@@ -46,8 +46,12 @@ function simulate(config) {
     }
     return added;
   }
-  const aloha = new Set();
-  for (let slot = 0; slot < slots; slot++) if (occupancy[slot].length === 1 && slotSinr(slot, occupancy[slot][0], aloha) >= config.threshold) aloha.add(occupancy[slot][0]);
+  let alohaState = (config.seed + 0x9e3779b9) >>> 0;
+  function alohaRandom() { alohaState ^= alohaState << 13; alohaState ^= alohaState >>> 17; alohaState ^= alohaState << 5; return (alohaState >>> 0) / 4294967296; }
+  const alohaOccupancy = new Uint16Array(slots);
+  for (let packet = 0; packet < users; packet++) alohaOccupancy[Math.floor(alohaRandom() * slots)]++;
+  let alohaCount = 0;
+  for (const count of alohaOccupancy) if (count === 1) alohaCount++;
   const crdsa = new Set();
   while (sicPass(crdsa, null, "sic")) {}
   function energy(slot) {
@@ -106,6 +110,6 @@ function simulate(config) {
     round++;
   }
   return {occupancy: occupancy.map(packets => packets.length), users, load: users * config.replicas / slots,
-    counts: [aloha.size, crdsa.size, decoded.size], extra: decoded.size - crdsa.size, correlations, trace};
+    counts: [alohaCount, crdsa.size, decoded.size], extra: decoded.size - crdsa.size, correlations, trace};
 }
 if (typeof module !== "undefined") module.exports = {simulate};

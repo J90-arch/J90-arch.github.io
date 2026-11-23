@@ -5,6 +5,7 @@ const definitions = [
   {key:"threshold", label:"Decode threshold", min:0.1, max:2, step:0.01, value:0.61, unit:"linear SINR"},
   {key:"seed", label:"Random seed", min:0, max:999, step:1, value:7, unit:"frame variation"}
 ];
+const ANIMATION_STEP_MS = 300;
 const grid = document.querySelector("#grid"), sliders = document.querySelector("#sliders");
 const cells = Array.from({length:100}, (_, index) => {
   const cell = document.createElement("div");
@@ -41,7 +42,7 @@ function run() {
   worker.onmessage = event => {
     if (event.data.id !== requestId) return;
     if (event.data.error) { state.textContent = "ERROR"; label.textContent = event.data.error; return; }
-    current = event.data.result; render(current); play();
+    current = event.data.result; play();
     worker.terminate(); worker = null;
   };
   worker.onerror = () => { state.textContent = "ERROR"; label.textContent = "Simulation failed. Try another frame."; };
@@ -72,8 +73,8 @@ function play() {
   clearInterval(animation); render(current);
   let index = 0;
   animation = setInterval(() => {
-    for (let batch = 0; batch < 2 && index < current.trace.length; batch++, index++) {
-      const event = current.trace[index], kind = event.stage === "marsala" ? "marsala" : "sic";
+    if (index < current.trace.length) {
+      const event = current.trace[index++], kind = event.stage === "marsala" ? "marsala" : "sic";
       for (const slot of event.slots) {
         const cell = cells[slot];
         cell.classList.remove("single", "collision", "empty", "flash");
@@ -85,7 +86,7 @@ function play() {
     eventCount.textContent = `${index} / ${current.trace.length}`;
     progress.style.width = `${100 * index / Math.max(1, current.trace.length)}%`;
     if (index >= current.trace.length) { clearInterval(animation); state.textContent = "COMPLETE"; label.textContent = `FRAME COMPLETE · ${current.counts[2]} packets delivered`; }
-  }, 85);
+  }, ANIMATION_STEP_MS);
 }
 document.querySelector("#new-frame").addEventListener("click", () => {
   inputs.seed.value = (Number(inputs.seed.value) + 1) % 1000;
